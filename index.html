@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MLP: Aether Genesis v19.5</title>
+    <title>MLP: Aether Genesis v19.7</title>
     <style>
         :root {
             --primary: #ff77bc; --secondary: #b377ff; --accent: #77e5ff;
@@ -28,6 +28,25 @@
             box-shadow: 0 25px 70px rgba(179, 119, 255, 0.5);
             width: 90%; max-width: 550px; text-align: center;
             transform-style: preserve-3d; transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            
+            /* Animación de entrada principal */
+            animation: windowInit 0.8s cubic-bezier(0.17, 0.67, 0.83, 0.67);
+        }
+
+        /* Animación de entrada para todas las ventanas */
+        @keyframes windowInit {
+            from { opacity: 0; transform: scale(0.8) translateY(50px) rotateX(-10deg); }
+            to { opacity: 1; transform: scale(1) translateY(0) rotateX(0deg); }
+        }
+
+        /* Animación de "vibración mágica" al seleccionar */
+        .magic-pulse {
+            animation: magicPulse 0.4s ease-out;
+        }
+        @keyframes magicPulse {
+            0% { transform: scale(1); box-shadow: 0 25px 70px rgba(179, 119, 255, 0.5); }
+            50% { transform: scale(1.02); box-shadow: 0 0 100px rgba(119, 229, 255, 0.8); border-color: var(--accent); }
+            100% { transform: scale(1); box-shadow: 0 25px 70px rgba(179, 119, 255, 0.5); }
         }
 
         .hidden { display: none !important; }
@@ -37,11 +56,12 @@
         button {
             width: 100%; padding: 20px; background: linear-gradient(135deg, var(--secondary), var(--primary));
             color: white; border: none; border-radius: 60px; cursor: pointer;
-            font-weight: 800; text-transform: uppercase; margin-top: 15px;
-            transition: 0.4s; box-shadow: 0 6px 20px rgba(179, 119, 255, 0.3);
+            font-weight: bold; text-transform: uppercase; margin-top: 15px;
+            transition: all 0.3s ease; box-shadow: 0 6px 20px rgba(179, 119, 255, 0.3);
             font-size: 0.95rem; border: 2px solid transparent;
         }
         button:hover { transform: translateY(-4px) scale(1.03); border-color: var(--accent); }
+        button:active { transform: translateY(1px); }
 
         .q-container { text-align: left; animation: fadeIn 0.6s ease; }
         .q-text { 
@@ -53,8 +73,15 @@
         .opt-btn { 
             background: #ffffff; color: var(--text); border: 2px solid #f0f0f0; 
             text-transform: none; text-align: left; font-weight: 500; padding: 15px 25px;
+            /* Animación de aparición escalonada para opciones */
+            opacity: 0; animation: optionFadeIn 0.5s forwards;
         }
         .opt-btn:hover { background: var(--bg); color: white; border-color: var(--primary); }
+
+        @keyframes optionFadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
         .loading-bar { width: 100%; height: 4px; background: #eee; border-radius: 2px; margin-bottom: 20px; overflow: hidden; }
         .loading-inner { width: 0%; height: 100%; background: var(--primary); transition: width 0.5s; }
@@ -83,7 +110,7 @@
 
 <div id="game-layer">
     <div id="scr-selector" class="engine-window">
-        <h1>🦄 GENESIS v19.5</h1>
+        <h1>🦄 GENESIS v19.7</h1>
         <div id="pony-list" style="max-height: 350px; overflow-y: auto; padding: 10px;"></div>
         <button id="btn-create">✨ NUEVA ALMA PONY</button>
     </div>
@@ -133,10 +160,9 @@
         requestAnimationFrame(loop);
     } loop();
 
-    let archive = JSON.parse(localStorage.getItem('mlp_genesis_v19_5')) || [];
+    let archive = JSON.parse(localStorage.getItem('mlp_genesis_v19_7')) || [];
     let active = null, qStep = 0;
 
-    // ALMACÉN MASIVO PARA EVITAR REPETICIONES
     const concepts = {
         s: ["Un cometa astral", "El cristal mágico", "La brisa del sur", "Un eco lejano", "La sombra lunar", "Un sueño lúcido", "El mapa antiguo", "La luz del alba", "Un rayo de sol", "La aurora", "El susurro del bosque", "La gema de la armonía", "Un portal de Canterlot", "El corazón de cristal", "Un deseo olvidado", "La nube de tormenta", "El brillo de Equestria", "Un rastro de pezuñas", "La risa de Pinkie", "El legado de Celestia", "La llama de la amistad", "Un destello de magia", "El horizonte eterno", "La verdad oculta", "El vínculo sagrado", "Un prisma de almas", "El canto de la luna", "La bruma de Everfree", "Un destello estelar", "La voluntad de Luna"],
         v: ["ilumina", "desvanece", "fragmenta", "purifica", "despierta", "revela", "consume", "teje", "protege", "sana", "transforma", "conecta", "fortalece", "vibra", "equilibra", "desafía", "invoca", "silencia", "amplifica", "nutre"],
@@ -160,13 +186,11 @@
     }
 
     function generateInfiniteStep() {
-        // EXTRAEMOS FÍSICAMENTE LOS CONCEPTOS PARA QUE NO SE REPITAN NUNCA
         const s = pool.s.pop();
         const v = pool.v.pop();
         const o = pool.o.pop();
         const question = `${s} ${v} ${o}. ¿Cómo reacciona tu núcleo ante esto?`;
         
-        // CONSTRUCCIÓN SINTÁCTICA DE RESPUESTAS (5 OPCIONES ÚNICAS)
         let responses = [];
         for(let i=0; i<5; i++) {
             const rs = pool.s.pop(); 
@@ -184,29 +208,56 @@
     }
 
     const scr = { sel: 'scr-selector', log: 'scr-login', test: 'scr-test', res: 'scr-result', love: 'love-overlay' };
-    function nav(id) { Object.values(scr).forEach(k => document.getElementById(k).classList.add('hidden')); document.getElementById(id).classList.remove('hidden'); }
+    
+    function nav(id) { 
+        Object.values(scr).forEach(k => document.getElementById(k).classList.add('hidden')); 
+        const nextWindow = document.getElementById(id);
+        nextWindow.classList.remove('hidden');
+        
+        // Reiniciar la animación de entrada al cambiar de ventana
+        nextWindow.style.animation = 'none';
+        nextWindow.offsetHeight; /* trigger reflow */
+        nextWindow.style.animation = null; 
+    }
 
     function updateList() {
         const list = document.getElementById('pony-list');
         list.innerHTML = archive.length ? "" : "<p style='color:#ccc'>No hay expedientes almacenados.</p>";
         archive.forEach((p, i) => {
             const div = document.createElement('div'); div.className = 'pony-slot';
-            div.innerHTML = `<div><strong>${p.n}</strong><br><small>${p.r}</small></div><button onclick="openPony(${i})" style="width:auto; padding:8px 20px; margin:0;">ABRIR</button>`;
+            div.innerHTML = `<div><strong>${p.n}</strong><br><small>${p.r}</small></div><button onclick="animateAndLoad(${i})" style="width:auto; padding:8px 20px; margin:0;">ABRIR</button>`;
             list.appendChild(div);
         });
     }
 
-    window.openPony = (i) => { active = archive[i]; renderFinal(); };
+    // Nueva función para animar antes de abrir un personaje existente
+    window.animateAndLoad = (i) => {
+        triggerMagicPulse();
+        setTimeout(() => {
+            active = archive[i]; renderFinal();
+        }, 4000); // Pequeño retraso para la animación
+    };
 
-    document.getElementById('btn-create').onclick = () => nav(scr.log);
+    function triggerMagicPulse() {
+        const activeWindow = document.querySelector('.engine-window:not(.hidden)');
+        if (activeWindow) {
+            activeWindow.classList.add('magic-pulse');
+            setTimeout(() => activeWindow.classList.remove('magic-pulse'), 400);
+        }
+    }
+
+    document.getElementById('btn-create').onclick = () => { triggerMagicPulse(); setTimeout(() => nav(scr.log), 400); };
     document.getElementById('btn-back').onclick = () => nav(scr.sel);
 
     document.getElementById('btn-start').onclick = () => {
         const name = document.getElementById('name-input').value.trim();
         if(!name) return;
-        active = { n: name, r: "Buscando Talento...", s: [], id: Date.now() };
-        qStep = 0; resetPool();
-        nav(scr.test); runTest();
+        triggerMagicPulse();
+        setTimeout(() => {
+            active = { n: name, r: "Buscando Talento...", s: [], id: Date.now() };
+            qStep = 0; resetPool();
+            nav(scr.test); runTest();
+        }, 400);
     };
 
     function runTest() {
@@ -220,9 +271,20 @@
         document.getElementById('q-progress').innerText = `SINAPSIS NEURAL ${qStep + 1} / 5`;
         document.getElementById('q-content').innerText = data.q;
         const stack = document.getElementById('options-stack'); stack.innerHTML = "";
-        data.opts.forEach(o => {
-            const b = document.createElement('button'); b.className = 'opt-btn'; b.innerText = o;
-            b.onclick = () => { qStep++; runTest(); }; stack.appendChild(b);
+        
+        data.opts.forEach((o, index) => {
+            const b = document.createElement('button'); 
+            b.className = 'opt-btn'; 
+            b.innerText = o;
+            // Aplicar retraso de animación escalonado
+            b.style.animationDelay = (index * 0.1) + "s";
+            b.onclick = () => {
+                triggerMagicPulse();
+                setTimeout(() => {
+                    qStep++; runTest();
+                }, 400);
+            }; 
+            stack.appendChild(b);
         });
     }
 
@@ -237,22 +299,28 @@
     }
 
     document.getElementById('btn-evolve').onclick = () => {
-        if(active.s.length < 3) {
-            active.s.push(createUniqueSkill());
-            renderFinal();
-        }
+        triggerMagicPulse();
+        setTimeout(() => {
+            if(active.s.length < 3) {
+                active.s.push(createUniqueSkill());
+                renderFinal();
+            }
+        }, 400);
     };
 
     document.getElementById('btn-save-final').onclick = () => {
-        const idx = archive.findIndex(p => p.id === active.id);
-        if(idx !== -1) archive[idx] = active;
-        localStorage.setItem('mlp_genesis_v19_5', JSON.stringify(archive));
-        
-        nav(scr.love);
+        triggerMagicPulse();
         setTimeout(() => {
-            nav(scr.sel);
-            updateList();
-        }, 5000);
+            const idx = archive.findIndex(p => p.id === active.id);
+            if(idx !== -1) archive[idx] = active;
+            localStorage.setItem('mlp_genesis_v19_7', JSON.stringify(archive));
+            
+            nav(scr.love);
+            setTimeout(() => {
+                nav(scr.sel);
+                updateList();
+            }, 5000);
+        }, 400);
     };
 
     updateList();

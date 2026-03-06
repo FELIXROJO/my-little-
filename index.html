@@ -2,518 +2,269 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Aether Infinity</title>
+<title>Aether Infinity v21.5</title>
 
 <style>
-
-:root{
---primary:#ff77bc;
---secondary:#b377ff;
---accent:#77e5ff;
---bg:#050505;
+:root {
+    --primary: #ff77bc;
+    --secondary: #b377ff;
+    --accent: #77e5ff;
+    --bg: #050505;
 }
 
-body{
-margin:0;
-background:var(--bg);
-font-family:Segoe UI;
-overflow:hidden;
-color:white;
+body {
+    margin: 0;
+    background: var(--bg);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    overflow: hidden;
+    color: white;
 }
 
-/* estrellas fondo */
+canvas { position: fixed; top: 0; left: 0; z-index: 0; }
 
-canvas{
-position:fixed;
-top:0;
-left:0;
-z-index:0;
+#stage {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    position: relative;
+    z-index: 2;
+    perspective: 1000px;
 }
 
-/* stage */
-
-#stage{
-display:flex;
-justify-content:center;
-align-items:center;
-height:100vh;
-position:relative;
-z-index:2;
+.window {
+    background: white;
+    color: black;
+    padding: 30px;
+    border-radius: 30px;
+    width: 520px;
+    max-width: 90%;
+    text-align: center;
+    box-shadow: 0 20px 50px rgba(0,0,0,.4);
+    animation: fadeIn 0.5s ease-out;
 }
 
-/* ventana */
+.hidden { display: none !important; }
 
-.window{
-background:white;
-color:black;
-padding:30px;
-border-radius:30px;
-width:520px;
-max-width:90%;
-text-align:center;
-animation:fadeIn .5s;
-box-shadow:0 20px 50px rgba(0,0,0,.4);
+button {
+    padding: 15px;
+    border: none;
+    border-radius: 20px;
+    margin: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    background: linear-gradient(135deg, var(--secondary), var(--primary));
+    color: white;
+    width: 100%;
+    transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-.hidden{display:none;}
+button:hover { transform: scale(1.05); filter: brightness(1.1); }
 
-button{
-padding:15px;
-border:none;
-border-radius:20px;
-margin:6px;
-cursor:pointer;
-font-weight:bold;
-background:linear-gradient(135deg,var(--secondary),var(--primary));
-color:white;
-width:100%;
-transition:.2s;
+.opt { background: white; color: black; border: 2px solid #eee; text-align: left; font-weight: 500; }
+.opt:hover { background: #fdf0f7; border-color: var(--primary); transform: translateX(5px); }
+
+.card { background: #fafafa; padding: 15px; border-radius: 15px; margin: 10px 0; border: 1px solid #eee; }
+
+#progressBar { width: 100%; height: 10px; background: #eee; border-radius: 10px; overflow: hidden; margin-bottom: 15px; }
+#progressFill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--primary), var(--accent)); transition: 0.4s ease-in-out; }
+
+/* Animaciones de Impacto Mágico */
+.magic-vibe { animation: magicVibe 0.4s ease-out; }
+@keyframes magicVibe {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.03); box-shadow: 0 0 30px var(--accent); }
+    100% { transform: scale(1); }
 }
 
-button:hover{
-transform:scale(1.05);
+@keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+/* Pantalla Te Amo Amor */
+#love {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: white; display: flex; flex-direction: column;
+    justify-content: center; align-items: center; z-index: 9999;
 }
-
-.opt{
-background:white;
-color:black;
-border:2px solid #eee;
-}
-
-.opt:hover{
-background:var(--secondary);
-color:white;
-}
-
-.card{
-background:#fafafa;
-padding:15px;
-border-radius:15px;
-margin:10px 0;
-}
-
-/* progreso */
-
-#progressBar{
-width:100%;
-height:8px;
-background:#eee;
-border-radius:10px;
-overflow:hidden;
-margin-bottom:10px;
-}
-
-#progressFill{
-height:100%;
-width:0%;
-background:linear-gradient(90deg,var(--primary),var(--accent));
-transition:.4s;
-}
-
-/* animaciones */
-
-.magic{
-animation:magic .3s;
-}
-
-@keyframes magic{
-0%{transform:scale(1)}
-50%{transform:scale(1.03)}
-100%{transform:scale(1)}
-}
-
-@keyframes fadeIn{
-from{opacity:0;transform:translateY(20px)}
-to{opacity:1}
-}
-
-/* pantalla amor */
-
-#love{
-position:fixed;
-top:0;
-left:0;
-width:100%;
-height:100%;
-background:white;
-display:flex;
-flex-direction:column;
-justify-content:center;
-align-items:center;
-z-index:999;
-}
-
-#love.hidden{
-display:none;
-}
-
-.heart{
-font-size:120px;
-color:#ff3b6b;
-animation:beat .5s infinite alternate;
-}
-
-@keyframes beat{
-from{transform:scale(1)}
-to{transform:scale(1.25)}
-}
-
-.loveText{
-font-size:70px;
-color:#ff77bc;
-font-family:cursive;
-margin-top:20px;
-}
-
+.heart { font-size: 140px; color: #ff3b6b; animation: beat 0.5s infinite alternate; }
+@keyframes beat { from { transform: scale(1); } to { transform: scale(1.25); } }
+.loveText { font-size: 60px; color: #ff77bc; font-family: 'Brush Script MT', cursive; margin-top: 20px; text-shadow: 2px 2px 0px #ffe0f0; }
 </style>
 </head>
 
 <body>
-
 <canvas id="bg"></canvas>
 
 <div id="stage">
+    <div id="menu" class="window">
+        <h2>AETHER INFINITY</h2>
+        <div id="list" style="max-height: 300px; overflow-y: auto;"></div>
+        <button onclick="newPony()">✨ Crear Pony</button>
+    </div>
 
-<div id="menu" class="window">
+    <div id="create" class="window hidden">
+        <h3>Nombre del Pony</h3>
+        <input id="name" style="padding:15px; width:85%; border-radius:30px; border:2px solid var(--accent); text-align:center; font-size:1.2rem; outline:none;">
+        <br><br>
+        <button onclick="startTest()">Comenzar Ritual</button>
+        <button onclick="back()" style="background:none; color:#999; box-shadow:none;">Volver</button>
+    </div>
 
-<h2>AETHER INFINITY</h2>
+    <div id="test" class="window hidden">
+        <div id="progressBar"><div id="progressFill"></div></div>
+        <div id="progressText" style="font-size: 0.8rem; color: var(--primary); font-weight: bold; margin-bottom: 10px;"></div>
+        <h3 id="question" style="text-align: left; line-height: 1.5; color: var(--secondary);"></h3>
+        <div id="options"></div>
+    </div>
 
-<div id="list"></div>
-
-<button onclick="newPony()">Crear Pony</button>
-
+    <div id="result" class="window hidden">
+        <h2 id="r_name" style="margin-bottom: 5px;"></h2>
+        <p id="r_race" style="font-weight: 900; color: var(--secondary); letter-spacing: 2px; text-transform: uppercase;"></p>
+        <p id="r_level" style="font-weight: bold; color: var(--accent);"></p>
+        <p id="r_story" style="font-size: 0.9rem; color: #666; font-style: italic;"></p>
+        <h3>Habilidades</h3>
+        <div id="r_skills"></div>
+        <button onclick="save()" style="background: #ffcc00; color: black; margin-top: 20px;">💖 Guardar en la Red</button>
+    </div>
 </div>
-
-<div id="create" class="window hidden">
-
-<h3>Nombre del Pony</h3>
-
-<input id="name" style="padding:10px;width:80%">
-
-<br><br>
-
-<button onclick="startTest()">Comenzar</button>
-<button onclick="back()">Volver</button>
-
-</div>
-
-<div id="test" class="window hidden">
-
-<div id="progressBar">
-<div id="progressFill"></div>
-</div>
-
-<div id="progressText"></div>
-
-<h3 id="question"></h3>
-
-<div id="options"></div>
-
-</div>
-
-<div id="result" class="window hidden">
-
-<h2 id="r_name"></h2>
-<p id="r_race"></p>
-<p id="r_level"></p>
-<p id="r_story"></p>
-
-<h3>Habilidades</h3>
-
-<div id="r_skills"></div>
-
-<button onclick="save()">Guardar</button>
-<button onclick="back()">Volver</button>
-
-</div>
-
-</div>
-
-<!-- pantalla amor -->
 
 <div id="love" class="hidden">
-
-<div class="heart">❤️</div>
-
-<div class="loveText">TE AMO AMOR</div>
-
+    <div class="heart">❤️</div>
+    <div class="loveText">TE AMO AMOR</div>
 </div>
 
 <script>
+// --- ESTRELLAS ---
+const canvas = document.getElementById("bg"), ctx = canvas.getContext("2d");
+let w, h, stars = [];
+function resize() { w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; }
+window.onresize = resize; resize();
+for(let i=0; i<150; i++) stars.push({x: Math.random()*w, y: Math.random()*h, r: Math.random()*1.5, v: Math.random()*0.3});
+function draw() {
+    ctx.fillStyle = "#050505"; ctx.fillRect(0,0,w,h);
+    stars.forEach(s => { s.y -= s.v; if(s.y<0) s.y=h; ctx.fillStyle="#ff77bc"; ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2); ctx.fill(); });
+    requestAnimationFrame(draw);
+} draw();
 
-/* estrellas fondo */
+// --- LÓGICA DE JUEGO ---
+let store = JSON.parse(localStorage.getItem("mlp_aether_v21_5")) || [];
+let active = null, step = 0;
 
-const canvas=document.getElementById("bg")
-const ctx=canvas.getContext("2d")
+// Diccionario de Singularidad (Evita repeticiones)
+const lexicon = {
+    s: ["Un portal mágico", "El cristal del imperio", "La sombra de Luna", "Un eco del bosque", "La brisa de Ponyville", "Un sueño de Celestia", "El mapa del destino", "Una chispa de magia"],
+    v: ["ilumina", "fragmenta", "despierta", "revela", "consume", "teje", "protege", "sana"],
+    o: ["tu alma pony", "la armonía", "el futuro", "la realidad", "tu corazón", "el destino", "el reino", "el tiempo"]
+};
+let pool = { s: [], v: [], o: [] };
 
-let w,h,stars=[]
-
-function resize(){
-w=canvas.width=window.innerWidth
-h=canvas.height=window.innerHeight
+function show(id) {
+    ["menu","create","test","result","love"].forEach(v => document.getElementById(v).classList.add("hidden"));
+    document.getElementById(id).classList.remove("hidden");
 }
 
-window.onresize=resize
-resize()
+function newPony() { document.getElementById("name").value = ""; show("create"); }
+function back() { show("menu"); refresh(); }
 
-for(let i=0;i<150;i++){
-stars.push({
-x:Math.random()*w,
-y:Math.random()*h,
-r:Math.random()*1.5,
-v:Math.random()*0.3
-})
+function startTest() {
+    const name = document.getElementById("name").value.trim();
+    if(!name) return;
+    active = { name, magic: 0, kind: 0, power: 0, skills: [], level: 1 };
+    step = 0;
+    // Barajado de sesión
+    pool.s = [...lexicon.s].sort(() => Math.random() - 0.5);
+    pool.v = [...lexicon.v].sort(() => Math.random() - 0.5);
+    pool.o = [...lexicon.o].sort(() => Math.random() - 0.5);
+    show("test"); run();
 }
 
-function draw(){
-ctx.fillStyle="#050505"
-ctx.fillRect(0,0,w,h)
+function run() {
+    const fill = document.getElementById("progressFill");
+    fill.style.width = (step / 5 * 100) + "%";
+    document.getElementById("progressText").innerText = `SINCRONIZACIÓN ${step + 1} / 5`;
 
-stars.forEach(s=>{
-s.y-=s.v
-if(s.y<0)s.y=h
+    if(step >= 5) { finish(); return; }
 
-ctx.fillStyle="#ff77bc"
-ctx.beginPath()
-ctx.arc(s.x,s.y,s.r,0,Math.PI*2)
-ctx.fill()
-})
+    // Extracción física (Cero repetición)
+    const s = pool.s.pop(), v = pool.v.pop(), o = pool.o.pop();
+    document.getElementById("question").innerText = `${s} ${v} ${o}. ¿Cómo reacciona tu magia?`;
 
-requestAnimationFrame(draw)
+    const box = document.getElementById("options"); box.innerHTML = "";
+    
+    // Generación dinámica de respuestas basada en el contexto
+    const ops = [
+        {t: `Usar magia para proteger ${o}`, type: "magic"},
+        {t: `Ayudar con amistad a ${o}`, type: "kind"},
+        {t: `Enfrentar con poder a ${s.toLowerCase()}`, type: "power"}
+    ].sort(() => Math.random() - 0.5);
+
+    ops.forEach(op => {
+        const b = document.createElement("button");
+        b.className = "opt";
+        b.innerText = op.t;
+        b.onclick = () => {
+            const win = document.getElementById("test");
+            win.classList.remove("magic-vibe"); void win.offsetWidth; win.classList.add("magic-vibe");
+            active[op.type]++;
+            step++;
+            setTimeout(run, 400); // Pequeña pausa para ver la vibración
+        };
+        box.appendChild(b);
+    });
 }
 
-draw()
+function finish() {
+    if(active.magic > active.power && active.magic > active.kind) active.race = "Unicornio Arcano";
+    else if(active.power > active.magic && active.power > active.kind) active.race = "Pegaso Guerrero";
+    else if(active.kind > active.power) active.race = "Pony de la Armonía";
+    else active.race = "Alicornio Legendario";
 
-/* juego */
-
-let store = JSON.parse(localStorage.getItem("aether")) || []
-let active=null
-let step=0
-
-const questions=[
-"Un portal mágico aparece frente a ti",
-"Un amigo necesita ayuda",
-"Una tormenta amenaza la ciudad",
-"Descubres un cristal antiguo",
-"Un enemigo desafía tu destino"
-]
-
-function show(id){
-
-["menu","create","test","result"].forEach(v=>{
-document.getElementById(v).classList.add("hidden")
-})
-
-document.getElementById(id).classList.remove("hidden")
-
+    active.level = Math.floor(Math.random() * 10) + 1;
+    active.skills = [skill(), skill()];
+    active.story = "Un pony cuyo destino fue marcado por la red neural de Equestria.";
+    render();
 }
 
-function newPony(){
-show("create")
+function skill() {
+    const names = ["Resonancia Estelar", "Nexo de Cristal", "Pulso de Armonía", "Alma Prismática", "Tormenta Celestial", "Llama Astral"];
+    return names[Math.floor(Math.random() * names.length)];
 }
 
-function back(){
-show("menu")
-refresh()
+function render() {
+    show("result");
+    document.getElementById("r_name").innerText = active.name.toUpperCase();
+    document.getElementById("r_race").innerText = active.race;
+    document.getElementById("r_level").innerText = "Nivel mágico: " + active.level;
+    document.getElementById("r_story").innerText = active.story;
+    const s = document.getElementById("r_skills"); s.innerHTML = "";
+    active.skills.forEach(v => {
+        const d = document.createElement("div"); d.className = "card"; d.innerHTML = `<b>TALENTO:</b> ${v}`;
+        s.appendChild(d);
+    });
 }
 
-function startTest(){
-
-const name=document.getElementById("name").value.trim()
-
-if(!name)return
-
-active={
-name:name,
-magic:0,
-kind:0,
-power:0,
-skills:[],
-level:1
+function save() {
+    store.push(active);
+    localStorage.setItem("mlp_aether_v21_5", JSON.stringify(store));
+    const love = document.getElementById("love");
+    love.classList.remove("hidden");
+    setTimeout(() => {
+        love.classList.add("hidden");
+        back();
+    }, 5000); // 5 segundos de Te Amo Amor
 }
 
-step=0
-
-show("test")
-
-run()
-
+function refresh() {
+    const list = document.getElementById("list"); list.innerHTML = "";
+    store.forEach((p, i) => {
+        const d = document.createElement("div"); d.className = "card";
+        d.innerHTML = `<b>${p.name}</b><br><small>${p.race}</small><br><button onclick="del(${i})" style="padding:5px; background:#ff4b4b; margin-top:5px; font-size:0.7rem;">ELIMINAR</button>`;
+        list.appendChild(d);
+    });
 }
 
-function run(){
+function del(i) { store.splice(i, 1); localStorage.setItem("mlp_aether_v21_5", JSON.stringify(store)); refresh(); }
 
-updateProgress()
-
-if(step>=questions.length){
-finish()
-return
-}
-
-document.getElementById("question").innerText=questions[step]
-
-const box=document.getElementById("options")
-box.innerHTML=""
-
-createOption("Usar magia antigua","magic")
-createOption("Ayudar con amistad","kind")
-createOption("Enfrentar con poder","power")
-
-}
-
-function createOption(text,type){
-
-const b=document.createElement("button")
-b.className="opt"
-b.innerText=text
-
-b.onclick=()=>{
-
-document.getElementById("test").classList.add("magic")
-
-setTimeout(()=>{
-
-document.getElementById("test").classList.remove("magic")
-
-active[type]++
-step++
-
-run()
-
-},200)
-
-}
-
-document.getElementById("options").appendChild(b)
-
-}
-
-function updateProgress(){
-
-const percent=(step/questions.length)*100
-
-document.getElementById("progressFill").style.width=percent+"%"
-
-document.getElementById("progressText").innerText=
-"Pregunta "+(step+1)+" / "+questions.length
-
-}
-
-function finish(){
-
-let race=""
-
-if(active.magic>active.power && active.magic>active.kind)
-race="Unicornio Arcano"
-
-else if(active.power>active.magic && active.power>active.kind)
-race="Pegaso Guerrero"
-
-else if(active.kind>active.power)
-race="Pony de la Armonía"
-
-else
-race="Alicornio Legendario"
-
-active.race=race
-active.level=Math.floor(Math.random()*10)+1
-
-active.skills.push(skill())
-active.skills.push(skill())
-
-active.story="Un pony cuyo destino fue marcado por la magia de Equestria."
-
-render()
-
-}
-
-function skill(){
-
-const names=[
-"Resonancia Estelar",
-"Nexo de Cristal",
-"Pulso de Armonía",
-"Alma Prismática",
-"Tormenta Celestial",
-"Llama Astral"
-]
-
-return names[Math.floor(Math.random()*names.length)]
-
-}
-
-function render(){
-
-show("result")
-
-document.getElementById("r_name").innerText=active.name
-document.getElementById("r_race").innerText=active.race
-document.getElementById("r_level").innerText="Nivel mágico: "+active.level
-document.getElementById("r_story").innerText=active.story
-
-const s=document.getElementById("r_skills")
-s.innerHTML=""
-
-active.skills.forEach(v=>{
-const d=document.createElement("div")
-d.className="card"
-d.innerText=v
-s.appendChild(d)
-})
-
-}
-
-function save(){
-
-store.push(active)
-
-localStorage.setItem("aether",JSON.stringify(store))
-
-document.getElementById("love").classList.remove("hidden")
-
-setTimeout(()=>{
-
-document.getElementById("love").classList.add("hidden")
-
-back()
-
-},5000)
-
-}
-
-function refresh(){
-
-const list=document.getElementById("list")
-list.innerHTML=""
-
-store.forEach((p,i)=>{
-
-const d=document.createElement("div")
-d.className="card"
-
-d.innerHTML=
-"<b>"+p.name+"</b><br>"+p.race+
-"<br>Nivel "+p.level+
-"<br><button onclick='del("+i+")'>Borrar</button>"
-
-list.appendChild(d)
-
-})
-
-}
-
-function del(i){
-
-store.splice(i,1)
-
-localStorage.setItem("aether",JSON.stringify(store))
-
-refresh()
-
-}
-
-refresh()
-
+refresh();
 </script>
-
 </body>
 </html>

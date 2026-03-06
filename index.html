@@ -21,12 +21,27 @@ overflow:hidden;
 color:white;
 }
 
+/* estrellas fondo */
+
+canvas{
+position:fixed;
+top:0;
+left:0;
+z-index:0;
+}
+
+/* stage */
+
 #stage{
 display:flex;
 justify-content:center;
 align-items:center;
 height:100vh;
+position:relative;
+z-index:2;
 }
+
+/* ventana */
 
 .window{
 background:white;
@@ -37,6 +52,7 @@ width:520px;
 max-width:90%;
 text-align:center;
 animation:fadeIn .5s;
+box-shadow:0 20px 50px rgba(0,0,0,.4);
 }
 
 .hidden{display:none;}
@@ -45,7 +61,7 @@ button{
 padding:15px;
 border:none;
 border-radius:20px;
-margin:5px;
+margin:6px;
 cursor:pointer;
 font-weight:bold;
 background:linear-gradient(135deg,var(--secondary),var(--primary));
@@ -76,6 +92,8 @@ border-radius:15px;
 margin:10px 0;
 }
 
+/* progreso */
+
 #progressBar{
 width:100%;
 height:8px;
@@ -92,11 +110,7 @@ background:linear-gradient(90deg,var(--primary),var(--accent));
 transition:.4s;
 }
 
-#progressText{
-font-size:14px;
-margin-bottom:10px;
-font-weight:bold;
-}
+/* animaciones */
 
 .magic{
 animation:magic .3s;
@@ -113,10 +127,50 @@ from{opacity:0;transform:translateY(20px)}
 to{opacity:1}
 }
 
+/* pantalla amor */
+
+#love{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:white;
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+z-index:999;
+}
+
+#love.hidden{
+display:none;
+}
+
+.heart{
+font-size:120px;
+color:#ff3b6b;
+animation:beat .5s infinite alternate;
+}
+
+@keyframes beat{
+from{transform:scale(1)}
+to{transform:scale(1.25)}
+}
+
+.loveText{
+font-size:70px;
+color:#ff77bc;
+font-family:cursive;
+margin-top:20px;
+}
+
 </style>
 </head>
 
 <body>
+
+<canvas id="bg"></canvas>
 
 <div id="stage">
 
@@ -139,7 +193,6 @@ to{opacity:1}
 <br><br>
 
 <button onclick="startTest()">Comenzar</button>
-
 <button onclick="back()">Volver</button>
 
 </div>
@@ -161,11 +214,8 @@ to{opacity:1}
 <div id="result" class="window hidden">
 
 <h2 id="r_name"></h2>
-
 <p id="r_race"></p>
-
 <p id="r_level"></p>
-
 <p id="r_story"></p>
 
 <h3>Habilidades</h3>
@@ -173,38 +223,80 @@ to{opacity:1}
 <div id="r_skills"></div>
 
 <button onclick="save()">Guardar</button>
-
 <button onclick="back()">Volver</button>
 
 </div>
 
 </div>
 
+<!-- pantalla amor -->
+
+<div id="love" class="hidden">
+
+<div class="heart">❤️</div>
+
+<div class="loveText">TE AMO AMOR</div>
+
+</div>
+
 <script>
 
+/* estrellas fondo */
+
+const canvas=document.getElementById("bg")
+const ctx=canvas.getContext("2d")
+
+let w,h,stars=[]
+
+function resize(){
+w=canvas.width=window.innerWidth
+h=canvas.height=window.innerHeight
+}
+
+window.onresize=resize
+resize()
+
+for(let i=0;i<150;i++){
+stars.push({
+x:Math.random()*w,
+y:Math.random()*h,
+r:Math.random()*1.5,
+v:Math.random()*0.3
+})
+}
+
+function draw(){
+ctx.fillStyle="#050505"
+ctx.fillRect(0,0,w,h)
+
+stars.forEach(s=>{
+s.y-=s.v
+if(s.y<0)s.y=h
+
+ctx.fillStyle="#ff77bc"
+ctx.beginPath()
+ctx.arc(s.x,s.y,s.r,0,Math.PI*2)
+ctx.fill()
+})
+
+requestAnimationFrame(draw)
+}
+
+draw()
+
+/* juego */
+
 let store = JSON.parse(localStorage.getItem("aether")) || []
+let active=null
+let step=0
 
-let active = null
-let step = 0
-
-const questions = [
-
-{q:"Un portal mágico aparece frente a ti"},
-{q:"Un amigo necesita ayuda"},
-{q:"Una tormenta amenaza la ciudad"},
-{q:"Descubres un cristal antiguo"},
-{q:"Un enemigo desafía tu destino"}
-
+const questions=[
+"Un portal mágico aparece frente a ti",
+"Un amigo necesita ayuda",
+"Una tormenta amenaza la ciudad",
+"Descubres un cristal antiguo",
+"Un enemigo desafía tu destino"
 ]
-
-function newPony(){
-show("create")
-}
-
-function back(){
-show("menu")
-refresh()
-}
 
 function show(id){
 
@@ -216,13 +308,22 @@ document.getElementById(id).classList.remove("hidden")
 
 }
 
+function newPony(){
+show("create")
+}
+
+function back(){
+show("menu")
+refresh()
+}
+
 function startTest(){
 
-const name = document.getElementById("name").value.trim()
+const name=document.getElementById("name").value.trim()
 
-if(!name) return
+if(!name)return
 
-active = {
+active={
 name:name,
 magic:0,
 kind:0,
@@ -244,17 +345,13 @@ function run(){
 updateProgress()
 
 if(step>=questions.length){
-
 finish()
 return
-
 }
 
-document.getElementById("question").innerText =
-questions[step].q
+document.getElementById("question").innerText=questions[step]
 
 const box=document.getElementById("options")
-
 box.innerHTML=""
 
 createOption("Usar magia antigua","magic")
@@ -266,9 +363,7 @@ createOption("Enfrentar con poder","power")
 function createOption(text,type){
 
 const b=document.createElement("button")
-
 b.className="opt"
-
 b.innerText=text
 
 b.onclick=()=>{
@@ -280,7 +375,6 @@ setTimeout(()=>{
 document.getElementById("test").classList.remove("magic")
 
 active[type]++
-
 step++
 
 run()
@@ -295,11 +389,11 @@ document.getElementById("options").appendChild(b)
 
 function updateProgress(){
 
-const percent = (step/questions.length)*100
+const percent=(step/questions.length)*100
 
-document.getElementById("progressFill").style.width = percent+"%"
+document.getElementById("progressFill").style.width=percent+"%"
 
-document.getElementById("progressText").innerText =
+document.getElementById("progressText").innerText=
 "Pregunta "+(step+1)+" / "+questions.length
 
 }
@@ -321,14 +415,12 @@ else
 race="Alicornio Legendario"
 
 active.race=race
-
-active.level = Math.floor(Math.random()*10)+1
+active.level=Math.floor(Math.random()*10)+1
 
 active.skills.push(skill())
 active.skills.push(skill())
 
-active.story =
-"Un pony cuyo destino fue marcado por la magia de Equestria."
+active.story="Un pony cuyo destino fue marcado por la magia de Equestria."
 
 render()
 
@@ -337,14 +429,12 @@ render()
 function skill(){
 
 const names=[
-
 "Resonancia Estelar",
 "Nexo de Cristal",
 "Pulso de Armonía",
 "Alma Prismática",
 "Tormenta Celestial",
 "Llama Astral"
-
 ]
 
 return names[Math.floor(Math.random()*names.length)]
@@ -361,17 +451,13 @@ document.getElementById("r_level").innerText="Nivel mágico: "+active.level
 document.getElementById("r_story").innerText=active.story
 
 const s=document.getElementById("r_skills")
-
 s.innerHTML=""
 
 active.skills.forEach(v=>{
-
 const d=document.createElement("div")
 d.className="card"
 d.innerText=v
-
 s.appendChild(d)
-
 })
 
 }
@@ -382,20 +468,26 @@ store.push(active)
 
 localStorage.setItem("aether",JSON.stringify(store))
 
+document.getElementById("love").classList.remove("hidden")
+
+setTimeout(()=>{
+
+document.getElementById("love").classList.add("hidden")
+
 back()
+
+},5000)
 
 }
 
 function refresh(){
 
 const list=document.getElementById("list")
-
 list.innerHTML=""
 
 store.forEach((p,i)=>{
 
 const d=document.createElement("div")
-
 d.className="card"
 
 d.innerHTML=

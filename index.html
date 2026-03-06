@@ -3,45 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MLP: Aether v22.4</title>
+    <title>MLP: Aether Infinity v22.6</title>
     <style>
         :root {
             --primary: #ff77bc; --secondary: #b377ff; --accent: #77e5ff;
-            --bg: #050505; --card: rgba(255, 255, 255, 0.98);
+            --bg: #050505; --card: rgba(255, 255, 255, 0.98); --text: #2d3436;
         }
-        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: var(--bg); font-family: 'Segoe UI', sans-serif; }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: var(--bg); font-family: 'Segoe UI', system-ui, sans-serif; }
         #canvas-bg { position: fixed; top: 0; left: 0; z-index: 1; pointer-events: none; }
         
         #stage { position: relative; z-index: 10; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; perspective: 1500px; }
 
         .window {
-            background: var(--card); padding: 2rem; border-radius: 40px; border: 6px solid var(--secondary);
-            box-shadow: 0 25px 70px rgba(179, 119, 255, 0.5); width: 90%; max-width: 500px; text-align: center;
-            animation: emerge 0.6s cubic-bezier(0.17, 0.67, 0.8, 1);
+            background: var(--card); padding: 2.5rem; border-radius: 40px; border: 6px solid var(--secondary);
+            box-shadow: 0 25px 70px rgba(179, 119, 255, 0.5); width: 90%; max-width: 520px; text-align: center;
+            animation: emerge 0.6s cubic-bezier(0.17, 0.67, 0.8, 1); transform-style: preserve-3d;
         }
+
+        .magic-vibe { animation: magicVibe 0.4s ease-out; }
+        @keyframes magicVibe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); box-shadow: 0 0 50px var(--accent); } }
+        @keyframes emerge { from { opacity: 0; transform: scale(0.8) rotateX(-20deg); } to { opacity: 1; transform: scale(1) rotateX(0); } }
 
         .hidden { display: none !important; }
         button {
             padding: 18px; border: none; border-radius: 50px; margin: 8px 0; cursor: pointer; font-weight: 900;
             background: linear-gradient(135deg, var(--secondary), var(--primary)); color: white; width: 100%;
-            text-transform: uppercase; transition: 0.3s;
+            text-transform: uppercase; transition: 0.3s; box-shadow: 0 5px 15px rgba(179, 119, 255, 0.3);
         }
 
-        /* CONSOLA DISCORD - MEJORADA */
+        .opt { background: white; color: var(--text); border: 2px solid #eee; text-transform: none; font-weight: 500; text-align: left; }
+        .opt:hover { border-color: var(--primary); background: #fff9fc; }
+
+        .loading-bar { width: 100%; height: 8px; background: #eee; border-radius: 10px; margin-bottom: 20px; overflow: hidden; }
+        .loading-fill { width: 0%; height: 100%; background: var(--primary); transition: width 0.4s; }
+
+        /* Consola Estilo Discord */
         #console {
             position: fixed; right: -350px; top: 0; width: 320px; height: 100%;
             background: #2f3136; border-left: 4px solid var(--primary);
             color: #dcddde; font-family: 'Consolas', monospace; padding: 20px;
-            z-index: 100000; transition: 0.5s ease-in-out; box-sizing: border-box;
+            z-index: 100000; transition: 0.5s ease; box-sizing: border-box;
         }
         #console.active-box { right: 0 !important; box-shadow: -10px 0 50px rgba(0,0,0,0.9); }
-        .log-entry { font-size: 0.75rem; margin-bottom: 5px; border-bottom: 1px solid #40444b; padding-bottom: 2px; }
         .console-input { width: 100%; background: #40444b; border: 1px solid #555; color: white; padding: 10px; border-radius: 5px; margin-top: 10px; outline: none; }
 
         #love { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 99999; display: flex; flex-direction: column; justify-content: center; align-items: center; }
-        .heart { font-size: 8rem; animation: beat 0.6s infinite; color: #ff4b4b; }
+        .heart { font-size: 10rem; animation: beat 0.6s infinite; color: #ff4b4b; }
         @keyframes beat { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.2); } }
-        @keyframes emerge { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
     </style>
 </head>
 <body>
@@ -50,67 +58,114 @@
 
 <div id="stage">
     <div id="menu" class="window">
-        <h2 id="title-trigger" style="color:var(--primary); cursor:pointer;">AETHER COMMAND v22.4</h2>
-        <div id="list" style="max-height: 350px; overflow-y: auto; margin-bottom: 15px;"></div>
+        <h2 id="title-trigger" style="color:var(--primary); cursor:pointer;">AETHER INFINITY v22.6</h2>
+        <div id="list" style="max-height: 300px; overflow-y: auto; margin-bottom: 15px;"></div>
         <button onclick="nav('create')">✨ CREAR PONY</button>
+        <p style="font-size: 0.6rem; color: #999; margin-top: 10px;">Presiona F2 para consola</p>
     </div>
 
     <div id="create" class="window hidden">
-        <h3>Registro de Usuario</h3>
-        <input id="name-in" placeholder="NOMBRE" style="width:100%; padding:15px; border-radius:30px; border:2px solid var(--accent); text-align:center; outline:none;">
+        <h3>Ritual de Sincronía</h3>
+        <input id="name-in" placeholder="NOMBRE" style="width:100%; padding:15px; border-radius:30px; border:2px solid var(--accent); text-align:center; font-size:1.2rem; outline:none;">
         <button onclick="startIA()">INICIAR IA</button>
-        <button onclick="nav('menu')">VOLVER</button>
+        <button onclick="nav('menu')">ATRÁS</button>
+    </div>
+
+    <div id="test" class="window hidden">
+        <div class="loading-bar"><div id="load-fill" class="loading-fill"></div></div>
+        <div id="q-progress" style="font-size: 0.8rem; color: var(--primary); font-weight: bold; margin-bottom: 10px;"></div>
+        <div id="q-box" style="text-align: left; line-height: 1.5; font-weight: bold; color: var(--secondary); margin-bottom: 20px;"></div>
+        <div id="options"></div>
     </div>
 
     <div id="result" class="window hidden">
-        <h2 id="res-name"></h2>
-        <p id="res-race" style="font-weight:900; color:var(--secondary);"></p>
-        <button onclick="save()">💖 GUARDAR EN DB</button>
+        <h2 id="res-name" style="margin:0;"></h2>
+        <p id="res-race" style="font-weight:900; color:var(--secondary); text-transform:uppercase;"></p>
+        <div id="res-skills"></div>
+        <button onclick="save()" style="background:#ffcc00; color:black;">💖 GUARDAR MEMORIA</button>
     </div>
 </div>
 
 <div id="console">
-    <div style="font-weight:bold; color:white; margin-bottom:10px; border-bottom:1px solid var(--primary);">🛡️ DISCORD CORE</div>
-    <div id="console-logs" style="height: 70%; overflow-y: auto; background: #202225; padding: 10px; margin-top:10px;"></div>
+    <div style="font-weight:bold; color:white; border-bottom:1px solid var(--primary);">🛡️ DISCORD CORE v22.6</div>
+    <div id="console-logs" style="height: 70%; overflow-y: auto; background: #202225; padding: 10px; margin-top:10px; font-size:0.75rem;"></div>
     <input type="password" id="pass-in" class="console-input" placeholder="Password (6663)">
     <input type="text" id="cmd-in" class="console-input hidden" placeholder="Ej: /clear, /rank [nom] [rango]">
 </div>
 
 <div id="love" class="hidden">
     <div class="heart">❤️</div>
-    <div style="font-family:cursive; font-size:3rem; color:var(--primary);">TE AMO AMOR</div>
+    <div style="font-family:cursive; font-size:4rem; color:var(--primary);">TE AMO AMOR</div>
 </div>
 
 <script>
-    // --- FONDO ---
     const canvas = document.getElementById('canvas-bg'), ctx = canvas.getContext('2d');
     let w, h, stars = [];
     function setup() { w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; }
     window.onresize = setup; setup();
-    for(let i=0; i<100; i++) stars.push({x: Math.random()*w, y: Math.random()*h, r: Math.random()*1.5, v: Math.random()*0.4});
+    for(let i=0; i<150; i++) stars.push({x: Math.random()*w, y: Math.random()*h, r: Math.random()*1.5, v: Math.random()*0.4});
     function render() {
         ctx.fillStyle = '#050505'; ctx.fillRect(0,0,w,h);
         ctx.fillStyle = '#ff77bc'; stars.forEach(s => { s.y -= s.v; if(s.y<0) s.y=h; ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI*2); ctx.fill(); });
         requestAnimationFrame(render);
     } render();
 
-    // --- LÓGICA ---
-    let db = JSON.parse(localStorage.getItem("mlp_discord_db_v24")) || [];
-    let cur = null;
+    let db = JSON.parse(localStorage.getItem("mlp_aether_v22_6")) || [];
+    let cur = null, step = 0;
+    const lexicon = {
+        s: ["Un cristal mágico", "La sombra de Luna", "El eco del bosque", "Un sueño lúcido", "La brisa lunar", "El mapa antiguo", "La aurora boreal", "Un cometa estelar"],
+        v: ["ilumina", "desvanece", "fragmenta", "purifica", "despierta", "revela", "consume", "teje"],
+        o: ["el tiempo", "tu alma pony", "la armonía", "el futuro", "la realidad", "tu corazón", "el destino", "el vacío"]
+    };
+    let pool = { s: [], v: [], o: [] };
 
     function nav(id) { document.querySelectorAll('.window').forEach(w => w.classList.add('hidden')); document.getElementById(id).classList.remove('hidden'); }
 
     function startIA() {
         const name = document.getElementById('name-in').value.trim();
         if(!name) return;
-        cur = { name, race: "Unicornio", rank: "User", id: Date.now() };
-        document.getElementById('res-name').innerText = name.toUpperCase();
-        document.getElementById('res-race').innerText = "RAZA: " + cur.race;
+        cur = { name, skills: [], race: "", rank: "Usuario", id: Date.now() }; step = 0;
+        pool.s = [...lexicon.s].sort(()=>Math.random()-0.5);
+        pool.v = [...lexicon.v].sort(()=>Math.random()-0.5);
+        pool.o = [...lexicon.o].sort(()=>Math.random()-0.5);
+        nav('test'); run();
+    }
+
+    function run() {
+        document.getElementById("load-fill").style.width = (step / 5 * 100) + "%";
+        document.getElementById("q-progress").innerText = `SINAPSIS ${step + 1} / 5`;
+        if(step >= 5) { finish(); return; }
+        const s = pool.s.pop(), v = pool.v.pop(), o = pool.o.pop();
+        document.getElementById("q-box").innerText = `${s} ${v} ${o}. ¿Cómo actúa tu esencia?`;
+        const box = document.getElementById("options"); box.innerHTML = "";
+        const ops = [`Protejo ${o} con magia.`, `Me adapto a ${v} con valor.`, `Busco equilibrio en ${s.toLowerCase()}.`, `Guío ${o} hacia la luz.`, `Sano ${o} con amistad.`].sort(()=>Math.random()-0.5);
+        ops.forEach(t => {
+            const b = document.createElement("button"); b.className = "opt"; b.innerText = t;
+            b.onclick = () => { 
+                document.getElementById('test').classList.add('magic-vibe');
+                setTimeout(() => { document.getElementById('test').classList.remove('magic-vibe'); step++; run(); }, 400);
+            };
+            box.appendChild(b);
+        });
+    }
+
+    function finish() {
+        const races = ["Unicornio Arcano", "Pegaso Guerrero", "Terrestre de Cristal", "Alicornio Legendario"];
+        cur.race = races[Math.floor(Math.random()*races.length)];
+        cur.skills = [["Resonancia Estelar", "Nexo de Cristal", "Pulso de Armonía"][Math.floor(Math.random()*3)]];
+        renderRes();
+    }
+
+    function renderRes() {
         nav('result');
+        document.getElementById('res-name').innerText = cur.name.toUpperCase();
+        document.getElementById('res-race').innerText = `${cur.race} | ${cur.rank}`;
+        const s = document.getElementById('res-skills'); s.innerHTML = "";
+        cur.skills.forEach(v => { s.innerHTML += `<div class="opt" style="padding:10px; margin-bottom:5px; border-radius:15px;">✨ ${v}</div>`; });
     }
 
     function save() {
-        db.push(cur); localStorage.setItem("mlp_discord_db_v24", JSON.stringify(db));
+        db.push(cur); localStorage.setItem("mlp_aether_v22_6", JSON.stringify(db));
         document.getElementById('love').classList.remove('hidden');
         setTimeout(() => { document.getElementById('love').classList.add('hidden'); refresh(); nav('menu'); }, 5000);
     }
@@ -118,37 +173,31 @@
     function refresh() {
         const list = document.getElementById('list'); list.innerHTML = "";
         db.forEach((p, i) => {
-            list.innerHTML += `<div style="background:#f9f9f9; color:black; padding:10px; margin-bottom:8px; border-radius:15px; border-left: 5px solid ${p.rank === 'Admin' ? '#5865f2' : '#b377ff'};">
-                <b>${p.name}</b> <span style="font-size:0.7rem;">[${p.rank}]</span>
-                <button onclick="del(${i})" style="width:auto; padding:2px 8px; float:right; background:#ed4245; font-size:0.6rem; color:white; border:none; border-radius:5px;">X</button></div>`;
+            list.innerHTML += `<div class="opt" style="padding:15px; margin-bottom:10px; border-radius:20px; display:flex; justify-content:space-between; border-left: 5px solid ${p.rank === 'Admin' ? '#5865f2' : '#eee'};">
+                <span><b>${p.name}</b><br><small>${p.race}</small></span>
+                <button onclick="del(${i})" style="width:auto; padding:5px 10px; font-size:0.6rem; background:#ff4b4b; border:none; border-radius:5px; color:white;">X</button></div>`;
         });
     }
-    function del(i) { db.splice(i, 1); localStorage.setItem("mlp_discord_db_v24", JSON.stringify(db)); refresh(); }
+    function del(i) { db.splice(i, 1); localStorage.setItem("mlp_aether_v22_6", JSON.stringify(db)); refresh(); }
 
-    function log(msg) {
-        const l = document.getElementById('console-logs');
-        l.innerHTML += `<div class="log-entry"><span style="color:#5865f2;">[LOG]</span> ${msg}</div>`;
-        l.scrollTop = l.scrollHeight;
-    }
-
-    // --- ACTIVADOR DE CONSOLA INDESTRUCTIBLE ---
-    let secret = "";
+    // --- ACTIVADOR F2 (AÑADIDO) ---
     window.addEventListener('keydown', (e) => {
-        secret += e.key.toLowerCase();
-        if (secret.includes("admin")) { // Si escribes "admin" en cualquier parte
+        if (e.key === "F2") {
+            e.preventDefault(); // Evita funciones del sistema
             openConsole();
-            secret = "";
         }
-        if (secret.length > 10) secret = secret.substring(1);
     });
-
-    document.getElementById('title-trigger').onclick = openConsole;
 
     function openConsole() {
         const c = document.getElementById('console');
-        c.style.right = "0px";
-        c.id = "console-active-box"; // Forzamos el cambio de ID para el estilo CSS
-        log("Consola Aether inicializada...");
+        c.style.right = "0px"; c.id = "console-active-box";
+        log("Consola F2 Activada.");
+    }
+
+    function log(msg) {
+        const l = document.getElementById('console-logs');
+        l.innerHTML += `<div><span style="color:#5865f2;">[LOG]</span> ${msg}</div>`;
+        l.scrollTop = l.scrollHeight;
     }
 
     document.getElementById('pass-in').onkeydown = (e) => {
@@ -156,27 +205,20 @@
             if(e.target.value === "6663") {
                 e.target.classList.add('hidden');
                 document.getElementById('cmd-in').classList.remove('hidden');
-                log("Acceso concedido. Bienvenido, Admin.");
-            } else { log("❌ Clave errónea."); e.target.value = ""; }
+                log("Acceso concedido.");
+            } else { log("⚠️ Error."); e.target.value = ""; }
         }
     };
 
     document.getElementById('cmd-in').onkeydown = (e) => {
         if(e.key === 'Enter') {
-            const full = e.target.value;
-            const args = full.split(" ");
-            const cmd = args[0].toLowerCase();
-
-            if(cmd === "/clear") { db = []; localStorage.clear(); log("Base de datos borrada."); refresh(); }
-            else if(cmd === "/rank") {
-                let p = db.find(x => x.name.toLowerCase() === args[1]?.toLowerCase());
-                if(p) { p.rank = args[2]; localStorage.setItem("mlp_discord_db_v24", JSON.stringify(db)); log(`Rango de ${args[1]} cambiado.`); refresh(); }
+            const f = e.target.value; const a = f.split(" "); const c = a[0].toLowerCase();
+            if(c === "/clear") { db = []; localStorage.clear(); log("Base de datos borrada."); refresh(); }
+            else if(c === "/rank") {
+                let p = db.find(x => x.name.toLowerCase() === a[1]?.toLowerCase());
+                if(p) { p.rank = a[2]; localStorage.setItem("mlp_aether_v22_6", JSON.stringify(db)); log(`Rango de ${a[1]} a ${a[2]}`); refresh(); }
             }
-            else if(cmd === "/exit") { 
-                const c = document.getElementById('console-active-box');
-                c.style.right = "-350px"; 
-                setTimeout(() => c.id = "console", 500);
-            }
+            else if(c === "/exit") { const x = document.getElementById('console-active-box'); x.style.right = "-350px"; setTimeout(()=>x.id="console", 500); }
             e.target.value = "";
         }
     };

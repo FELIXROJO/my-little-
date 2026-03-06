@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MLP: Aether Absolute v17.1</title>
+    <title>MLP: Aether Genesis v19.5</title>
     <style>
         :root {
             --primary: #ff77bc; --secondary: #b377ff; --accent: #77e5ff;
@@ -83,7 +83,7 @@
 
 <div id="game-layer">
     <div id="scr-selector" class="engine-window">
-        <h1>🦄 AETHER v17.1</h1>
+        <h1>🦄 GENESIS v19.5</h1>
         <div id="pony-list" style="max-height: 350px; overflow-y: auto; padding: 10px;"></div>
         <button id="btn-create">✨ NUEVA ALMA PONY</button>
     </div>
@@ -133,16 +133,17 @@
         requestAnimationFrame(loop);
     } loop();
 
-    let archive = JSON.parse(localStorage.getItem('mlp_absolute_v17_1')) || [];
+    let archive = JSON.parse(localStorage.getItem('mlp_genesis_v19_5')) || [];
     let active = null, qStep = 0;
 
-    const data = {
-        s: ["Un cometa astral", "El cristal mágico", "La brisa del sur", "Un eco lejano", "La sombra lunar", "Un sueño lúcido", "El mapa antiguo", "La luz del alba", "Un rayo de sol", "La aurora"],
-        v: ["ilumina", "desvanece", "fragmenta", "purifica", "despierta", "revela", "consume", "teje", "protege", "sana"],
-        c: ["el tiempo", "tu alma pony", "la armonía", "el futuro", "la realidad", "tu memoria", "el corazón", "el vacío", "la amistad", "el destino"]
+    // ALMACÉN MASIVO PARA EVITAR REPETICIONES
+    const concepts = {
+        s: ["Un cometa astral", "El cristal mágico", "La brisa del sur", "Un eco lejano", "La sombra lunar", "Un sueño lúcido", "El mapa antiguo", "La luz del alba", "Un rayo de sol", "La aurora", "El susurro del bosque", "La gema de la armonía", "Un portal de Canterlot", "El corazón de cristal", "Un deseo olvidado", "La nube de tormenta", "El brillo de Equestria", "Un rastro de pezuñas", "La risa de Pinkie", "El legado de Celestia", "La llama de la amistad", "Un destello de magia", "El horizonte eterno", "La verdad oculta", "El vínculo sagrado", "Un prisma de almas", "El canto de la luna", "La bruma de Everfree", "Un destello estelar", "La voluntad de Luna"],
+        v: ["ilumina", "desvanece", "fragmenta", "purifica", "despierta", "revela", "consume", "teje", "protege", "sana", "transforma", "conecta", "fortalece", "vibra", "equilibra", "desafía", "invoca", "silencia", "amplifica", "nutre"],
+        o: ["el tiempo", "tu alma pony", "la armonía", "el futuro", "la realidad", "tu memoria", "el corazón", "el vacío", "la amistad", "el destino", "la chispa", "el camino", "la verdad", "el vínculo", "la luz", "el horizonte", "la paz", "el misterio", "el equilibrio", "la esencia"]
     };
 
-    let sessionPool = { s: [], v: [], c: [] };
+    let pool = { s: [], v: [], o: [] };
 
     function shuffle(array) {
         for (let i = array.length - 1; i > 0; i--) {
@@ -152,31 +153,34 @@
         return array;
     }
 
-    function startSession() {
-        sessionPool.s = shuffle([...data.s]);
-        sessionPool.v = shuffle([...data.v]);
-        sessionPool.c = shuffle([...data.c]);
+    function resetPool() {
+        pool.s = shuffle([...concepts.s]);
+        pool.v = shuffle([...concepts.v]);
+        pool.o = shuffle([...concepts.o]);
     }
 
-    function createUniqueQuestion() {
-        const s = sessionPool.s.pop();
-        const v = sessionPool.v.pop();
-        const c = sessionPool.c.pop();
-        const text = `${s} ${v} ${c}. ¿Cómo respondes ante este cambio?`;
-        const opts = shuffle([
-            `Uso mi bondad para equilibrar ${c}.`,
-            `Me adapto con la valentía de un pegaso.`,
-            `Confío en la magia de mi cuerno para ${v}.`,
-            `Mantengo mi lealtad hacia ${c}.`,
-            `Comparto mi risa para sanar ${c}.`
-        ]);
-        return { text, opts };
+    function generateInfiniteStep() {
+        // EXTRAEMOS FÍSICAMENTE LOS CONCEPTOS PARA QUE NO SE REPITAN NUNCA
+        const s = pool.s.pop();
+        const v = pool.v.pop();
+        const o = pool.o.pop();
+        const question = `${s} ${v} ${o}. ¿Cómo reacciona tu núcleo ante esto?`;
+        
+        // CONSTRUCCIÓN SINTÁCTICA DE RESPUESTAS (5 OPCIONES ÚNICAS)
+        let responses = [];
+        for(let i=0; i<5; i++) {
+            const rs = pool.s.pop(); 
+            const rv = pool.v.pop();
+            const ro = pool.o.pop();
+            responses.push(`Elijo usar ${rs.toLowerCase()} para ${rv} ${ro}.`);
+        }
+        return { q: question, opts: shuffle(responses) };
     }
 
     function createUniqueSkill() {
-        const n = ["Nexo", "Resonancia", "Cénit", "Santuario", "Espejo", "Chispa"][Math.floor(Math.random()*6)];
-        const e = ["Primordial", "Estelar", "de Almas", "Eterno", "de Cristal"][Math.floor(Math.random()*5)];
-        return { n: `${n} ${e}`, d: "Talento único generado por la Red Neural de Equestria." };
+        const n = ["Nexo", "Resonancia", "Cénit", "Santuario", "Espejo", "Chispa", "Prisma", "Fulgor"][Math.floor(Math.random()*8)];
+        const e = ["Primordial", "Estelar", "de Almas", "Eterno", "de Cristal", "Divergente"][Math.floor(Math.random()*6)];
+        return { n: `${n} ${e}`, d: "Talento único generado por el motor de síntesis Aether." };
     }
 
     const scr = { sel: 'scr-selector', log: 'scr-login', test: 'scr-test', res: 'scr-result', love: 'love-overlay' };
@@ -200,8 +204,8 @@
     document.getElementById('btn-start').onclick = () => {
         const name = document.getElementById('name-input').value.trim();
         if(!name) return;
-        active = { n: name, r: "Calculando...", s: [], id: Date.now() };
-        qStep = 0; startSession();
+        active = { n: name, r: "Buscando Talento...", s: [], id: Date.now() };
+        qStep = 0; resetPool();
         nav(scr.test); runTest();
     };
 
@@ -212,11 +216,11 @@
             active.s.push(createUniqueSkill());
             archive.push(active); renderFinal(); return;
         }
-        const q = createUniqueQuestion();
-        document.getElementById('q-progress').innerText = `SINCRONIZACIÓN ${qStep + 1} / 5`;
-        document.getElementById('q-content').innerText = q.text;
+        const data = generateInfiniteStep();
+        document.getElementById('q-progress').innerText = `SINAPSIS NEURAL ${qStep + 1} / 5`;
+        document.getElementById('q-content').innerText = data.q;
         const stack = document.getElementById('options-stack'); stack.innerHTML = "";
-        q.opts.forEach(o => {
+        data.opts.forEach(o => {
             const b = document.createElement('button'); b.className = 'opt-btn'; b.innerText = o;
             b.onclick = () => { qStep++; runTest(); }; stack.appendChild(b);
         });
@@ -242,7 +246,7 @@
     document.getElementById('btn-save-final').onclick = () => {
         const idx = archive.findIndex(p => p.id === active.id);
         if(idx !== -1) archive[idx] = active;
-        localStorage.setItem('mlp_absolute_v17_1', JSON.stringify(archive));
+        localStorage.setItem('mlp_genesis_v19_5', JSON.stringify(archive));
         
         nav(scr.love);
         setTimeout(() => {

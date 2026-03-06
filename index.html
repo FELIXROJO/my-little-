@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MLP: Aether v22.3</title>
+    <title>MLP: Aether v22.4</title>
     <style>
         :root {
             --primary: #ff77bc; --secondary: #b377ff; --accent: #77e5ff;
@@ -27,21 +27,21 @@
             text-transform: uppercase; transition: 0.3s;
         }
 
-        /* Consola Estilo Discord */
+        /* CONSOLA DISCORD - MEJORADA */
         #console {
             position: fixed; right: -350px; top: 0; width: 320px; height: 100%;
             background: #2f3136; border-left: 4px solid var(--primary);
             color: #dcddde; font-family: 'Consolas', monospace; padding: 20px;
-            z-index: 100000; transition: 0.4s ease; box-sizing: border-box;
+            z-index: 100000; transition: 0.5s ease-in-out; box-sizing: border-box;
         }
-        #console.active { right: 0; }
+        #console.active-box { right: 0 !important; box-shadow: -10px 0 50px rgba(0,0,0,0.9); }
         .log-entry { font-size: 0.75rem; margin-bottom: 5px; border-bottom: 1px solid #40444b; padding-bottom: 2px; }
-        .log-tag { color: #5865f2; font-weight: bold; }
-        .console-input { width: 100%; background: #40444b; border: none; color: white; padding: 10px; border-radius: 5px; margin-top: 10px; outline: none; }
+        .console-input { width: 100%; background: #40444b; border: 1px solid #555; color: white; padding: 10px; border-radius: 5px; margin-top: 10px; outline: none; }
 
         #love { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 99999; display: flex; flex-direction: column; justify-content: center; align-items: center; }
         .heart { font-size: 8rem; animation: beat 0.6s infinite; color: #ff4b4b; }
         @keyframes beat { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.2); } }
+        @keyframes emerge { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
     </style>
 </head>
 <body>
@@ -50,7 +50,7 @@
 
 <div id="stage">
     <div id="menu" class="window">
-        <h2 id="admin-trigger" style="color:var(--primary); cursor: pointer; user-select: none;">AETHER COMMAND v22.3</h2>
+        <h2 id="title-trigger" style="color:var(--primary); cursor:pointer;">AETHER COMMAND v22.4</h2>
         <div id="list" style="max-height: 350px; overflow-y: auto; margin-bottom: 15px;"></div>
         <button onclick="nav('create')">✨ CREAR PONY</button>
     </div>
@@ -59,22 +59,21 @@
         <h3>Registro de Usuario</h3>
         <input id="name-in" placeholder="NOMBRE" style="width:100%; padding:15px; border-radius:30px; border:2px solid var(--accent); text-align:center; outline:none;">
         <button onclick="startIA()">INICIAR IA</button>
-        <button onclick="nav('menu')" style="background:none; color:#999;">VOLVER</button>
+        <button onclick="nav('menu')">VOLVER</button>
     </div>
 
     <div id="result" class="window hidden">
         <h2 id="res-name"></h2>
         <p id="res-race" style="font-weight:900; color:var(--secondary);"></p>
-        <div id="res-skills"></div>
         <button onclick="save()">💖 GUARDAR EN DB</button>
     </div>
 </div>
 
 <div id="console">
-    <div style="font-weight:bold; color:white; margin-bottom:10px;">🛡️ CORE CONSOLE</div>
-    <div id="console-logs" style="height: 75%; overflow-y: auto; background: #202225; padding: 10px; border-radius: 5px;"></div>
+    <div style="font-weight:bold; color:white; margin-bottom:10px; border-bottom:1px solid var(--primary);">🛡️ DISCORD CORE</div>
+    <div id="console-logs" style="height: 70%; overflow-y: auto; background: #202225; padding: 10px; margin-top:10px;"></div>
     <input type="password" id="pass-in" class="console-input" placeholder="Password (6663)">
-    <input type="text" id="cmd-in" class="console-input hidden" placeholder="Ej: /clear, /rank [nombre] [rango]">
+    <input type="text" id="cmd-in" class="console-input hidden" placeholder="Ej: /clear, /rank [nom] [rango]">
 </div>
 
 <div id="love" class="hidden">
@@ -83,6 +82,7 @@
 </div>
 
 <script>
+    // --- FONDO ---
     const canvas = document.getElementById('canvas-bg'), ctx = canvas.getContext('2d');
     let w, h, stars = [];
     function setup() { w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; }
@@ -94,7 +94,8 @@
         requestAnimationFrame(render);
     } render();
 
-    let db = JSON.parse(localStorage.getItem("mlp_discord_db")) || [];
+    // --- LÓGICA ---
+    let db = JSON.parse(localStorage.getItem("mlp_discord_db_v24")) || [];
     let cur = null;
 
     function nav(id) { document.querySelectorAll('.window').forEach(w => w.classList.add('hidden')); document.getElementById(id).classList.remove('hidden'); }
@@ -102,20 +103,14 @@
     function startIA() {
         const name = document.getElementById('name-in').value.trim();
         if(!name) return;
-        cur = { name, skills: ["Nexo Estelar"], race: "Unicornio", rank: "User", date: new Date().toLocaleDateString() };
-        renderRes();
-    }
-
-    function renderRes() {
+        cur = { name, race: "Unicornio", rank: "User", id: Date.now() };
+        document.getElementById('res-name').innerText = name.toUpperCase();
+        document.getElementById('res-race').innerText = "RAZA: " + cur.race;
         nav('result');
-        document.getElementById('res-name').innerText = cur.name.toUpperCase();
-        document.getElementById('res-race').innerText = `${cur.race} | Rango: ${cur.rank}`;
-        document.getElementById('res-skills').innerHTML = `<div style="padding:10px; background:#f0f0f0; border-radius:10px; margin:10px 0;">Habilidad: ${cur.skills[0]}</div>`;
     }
 
     function save() {
-        db.push(cur); localStorage.setItem("mlp_discord_db", JSON.stringify(db));
-        log(`Pony ${cur.name} guardado con éxito.`);
+        db.push(cur); localStorage.setItem("mlp_discord_db_v24", JSON.stringify(db));
         document.getElementById('love').classList.remove('hidden');
         setTimeout(() => { document.getElementById('love').classList.add('hidden'); refresh(); nav('menu'); }, 5000);
     }
@@ -123,72 +118,64 @@
     function refresh() {
         const list = document.getElementById('list'); list.innerHTML = "";
         db.forEach((p, i) => {
-            list.innerHTML += `<div style="background:#f9f9f9; padding:10px; margin-bottom:8px; border-radius:15px; border-left: 5px solid ${p.rank === 'Admin' ? '#5865f2' : '#b377ff'};">
-                <b>${p.name}</b> <span style="font-size:0.7rem; color:#72767d;">[${p.rank}]</span>
-                <button onclick="del(${i})" style="width:auto; padding:2px 8px; float:right; background:#ed4245; font-size:0.6rem;">X</button></div>`;
+            list.innerHTML += `<div style="background:#f9f9f9; color:black; padding:10px; margin-bottom:8px; border-radius:15px; border-left: 5px solid ${p.rank === 'Admin' ? '#5865f2' : '#b377ff'};">
+                <b>${p.name}</b> <span style="font-size:0.7rem;">[${p.rank}]</span>
+                <button onclick="del(${i})" style="width:auto; padding:2px 8px; float:right; background:#ed4245; font-size:0.6rem; color:white; border:none; border-radius:5px;">X</button></div>`;
         });
     }
-    function del(i) { db.splice(i, 1); localStorage.setItem("mlp_discord_db", JSON.stringify(db)); refresh(); }
+    function del(i) { db.splice(i, 1); localStorage.setItem("mlp_discord_db_v24", JSON.stringify(db)); refresh(); }
 
     function log(msg) {
         const l = document.getElementById('console-logs');
-        l.innerHTML += `<div class="log-entry"><span class="log-tag">[SYSTEM]</span> ${msg}</div>`;
+        l.innerHTML += `<div class="log-entry"><span style="color:#5865f2;">[LOG]</span> ${msg}</div>`;
         l.scrollTop = l.scrollHeight;
     }
 
-    // --- SISTEMA DE COMANDOS DISCORD ---
-    let clickCount = 0;
-    document.getElementById('admin-trigger').onclick = () => {
-        clickCount++;
-        if(clickCount >= 3) { document.getElementById('console').classList.add('active'); clickCount = 0; log("Panel de administración abierto."); }
-    };
+    // --- ACTIVADOR DE CONSOLA INDESTRUCTIBLE ---
+    let secret = "";
+    window.addEventListener('keydown', (e) => {
+        secret += e.key.toLowerCase();
+        if (secret.includes("admin")) { // Si escribes "admin" en cualquier parte
+            openConsole();
+            secret = "";
+        }
+        if (secret.length > 10) secret = secret.substring(1);
+    });
+
+    document.getElementById('title-trigger').onclick = openConsole;
+
+    function openConsole() {
+        const c = document.getElementById('console');
+        c.style.right = "0px";
+        c.id = "console-active-box"; // Forzamos el cambio de ID para el estilo CSS
+        log("Consola Aether inicializada...");
+    }
 
     document.getElementById('pass-in').onkeydown = (e) => {
         if(e.key === 'Enter') {
             if(e.target.value === "6663") {
                 e.target.classList.add('hidden');
                 document.getElementById('cmd-in').classList.remove('hidden');
-                log("Acceso de desarrollador concedido.");
-            } else { log("⚠️ Contraseña incorrecta."); e.target.value = ""; }
+                log("Acceso concedido. Bienvenido, Admin.");
+            } else { log("❌ Clave errónea."); e.target.value = ""; }
         }
     };
 
     document.getElementById('cmd-in').onkeydown = (e) => {
         if(e.key === 'Enter') {
-            const fullCmd = e.target.value;
-            const args = fullCmd.split(" ");
+            const full = e.target.value;
+            const args = full.split(" ");
             const cmd = args[0].toLowerCase();
 
-            switch(cmd) {
-                case "/clear":
-                    db = []; localStorage.clear();
-                    log("✅ Base de datos purgada.");
-                    refresh();
-                    break;
-                
-                case "/rank":
-                    if(args.length < 3) { log("❌ Uso: /rank [nombre] [rango]"); }
-                    else {
-                        let target = db.find(p => p.name.toLowerCase() === args[1].toLowerCase());
-                        if(target) {
-                            target.rank = args[2];
-                            localStorage.setItem("mlp_discord_db", JSON.stringify(db));
-                            log(`⭐ ${target.name} ahora es ${args[2]}.`);
-                            refresh();
-                        } else { log(`❓ No se encontró a ${args[1]}.`); }
-                    }
-                    break;
-
-                case "/list":
-                    log(`Registros actuales: ${db.length}`);
-                    break;
-
-                case "/exit":
-                    document.getElementById('console').classList.remove('active');
-                    break;
-
-                default:
-                    log(`🚫 Comando desconocido: ${cmd}`);
+            if(cmd === "/clear") { db = []; localStorage.clear(); log("Base de datos borrada."); refresh(); }
+            else if(cmd === "/rank") {
+                let p = db.find(x => x.name.toLowerCase() === args[1]?.toLowerCase());
+                if(p) { p.rank = args[2]; localStorage.setItem("mlp_discord_db_v24", JSON.stringify(db)); log(`Rango de ${args[1]} cambiado.`); refresh(); }
+            }
+            else if(cmd === "/exit") { 
+                const c = document.getElementById('console-active-box');
+                c.style.right = "-350px"; 
+                setTimeout(() => c.id = "console", 500);
             }
             e.target.value = "";
         }

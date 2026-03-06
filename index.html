@@ -3,203 +3,143 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MLP: Neural Network v13.5</title>
+    <title>MLP: Aether Core IA</title>
     <style>
-        :root { --primary: #ff77bc; --secondary: #b377ff; --accent: #77e5ff; --bg: #fff5f9; --card: #ffffff; --text: #5a4a5e; }
-        body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 15px; box-sizing: border-box; }
-        #app-container { background: var(--card); padding: 2rem; border-radius: 30px; border: 4px solid var(--secondary); box-shadow: 0 15px 40px rgba(179, 119, 255, 0.15); width: 100%; max-width: 550px; text-align: center; }
+        :root { --primary: #ff77bc; --secondary: #b377ff; --accent: #77e5ff; --bg: #0a0a0a; --card: rgba(255, 255, 255, 0.95); }
+        body { background: var(--bg); color: #333; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; overflow: hidden; }
+        
+        /* Fondo Animado de IA */
+        #canvas { position: fixed; top: 0; left: 0; z-index: -1; filter: blur(2px); }
+
+        #app-container { background: var(--card); padding: 2rem; border-radius: 30px; border: 4px solid var(--secondary); box-shadow: 0 0 50px rgba(179, 119, 255, 0.4); width: 90%; max-width: 500px; text-align: center; position: relative; backdrop-filter: blur(10px); }
         .hidden { display: none !important; }
-        input { width: 100%; padding: 15px; margin: 10px 0; border: 2px solid var(--accent); border-radius: 50px; text-align: center; font-size: 1.1rem; outline: none; box-sizing: border-box; }
-        button { width: 100%; padding: 16px; background: var(--secondary); color: white; border: none; border-radius: 50px; cursor: pointer; font-weight: bold; text-transform: uppercase; margin-top: 12px; transition: 0.3s; font-size: 0.9rem; }
-        .q-text { color: var(--secondary); font-size: 1.1rem; font-weight: bold; margin-bottom: 25px; text-align: left; border-left: 4px solid var(--primary); padding-left: 15px; line-height: 1.5; }
-        .opt-btn { background: white; color: var(--text); border: 2px solid var(--accent); text-transform: none; text-align: left; font-weight: normal; }
-        .stat-box { border: 2px dashed var(--primary); padding: 15px; margin: 15px 0; background: #fff9fc; border-radius: 15px; text-align: left; }
-        #love-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 10000; display: flex; flex-direction: column; justify-content: center; align-items: center; animation: fadeIn 0.5s ease; }
-        .heart { font-size: 7rem; animation: beat 0.8s infinite; color: #ff4b4b; cursor: pointer; }
-        .love-msg { font-size: 3rem; font-family: 'cursive'; color: var(--primary); margin-top: 20px; }
+        
+        button { width: 100%; padding: 15px; background: var(--secondary); color: white; border: none; border-radius: 50px; cursor: pointer; font-weight: bold; text-transform: uppercase; margin-top: 10px; transition: 0.3s; box-shadow: 0 4px 15px rgba(179, 119, 255, 0.3); }
+        button:hover { transform: scale(1.02); filter: brightness(1.1); }
+        
+        .q-text { color: var(--secondary); font-size: 1.2rem; font-weight: bold; margin-bottom: 20px; text-align: left; line-height: 1.4; border-left: 5px solid var(--primary); padding-left: 15px; animation: slideIn 0.5s ease; }
+        .opt-btn { background: white; color: #555; border: 2px solid var(--accent); text-transform: none; text-align: left; font-weight: normal; margin-bottom: 8px; }
+        
+        .stat-box { border: 2px dashed var(--primary); padding: 15px; margin: 15px 0; background: rgba(255, 119, 188, 0.05); border-radius: 20px; text-align: left; }
+        
+        /* Corazón Final */
+        #love-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 10000; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        .heart { font-size: 8rem; animation: beat 0.6s infinite; color: #ff4b4b; text-shadow: 0 0 30px rgba(255, 75, 75, 0.5); }
+        .love-msg { font-size: 3rem; font-family: 'Brush Script MT', cursive; color: var(--primary); margin-top: 20px; }
         @keyframes beat { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.2); } }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
     </style>
 </head>
 <body>
 
+<canvas id="canvas"></canvas>
+
 <div id="app-container">
-    <h1 style="color: var(--primary);">🧠 NEURAL NETWORK v13.5</h1>
+    <h1 style="color: var(--primary); text-shadow: 2px 2px #fff;">✨ AETHER CORE v14.0</h1>
 
-    <div id="screen-network">
-        <h3 style="color: var(--secondary);">RED DE APRENDIZAJE</h3>
-        <div id="user-list" style="margin-bottom: 20px;"></div>
-        <button id="btn-create">✨ NUEVA SINAPSIS</button>
-    </div>
-
-    <div id="screen-login" class="hidden">
-        <input type="text" id="name-input" placeholder="NOMBRE DEL PONI" autocomplete="off">
-        <button id="btn-start">CONECTAR IA</button>
+    <div id="screen-net">
+        <div id="user-list" style="max-height: 200px; overflow-y: auto; margin-bottom: 20px;"></div>
+        <button id="btn-new">✨ CREAR CONEXIÓN IA</button>
     </div>
 
     <div id="screen-test" class="hidden">
         <div id="q-content" class="q-text"></div>
-        <div id="options-grid" style="display: flex; flex-direction: column; gap: 8px;"></div>
+        <div id="options-box"></div>
     </div>
 
-    <div id="screen-profile" class="hidden">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-            <button onclick="location.reload()" style="width:auto; padding:5px 15px;">RED</button>
-            <button id="btn-save" style="width:auto; padding:5px 15px; background:#ffcc00;">💾 GUARDAR</button>
+    <div id="screen-res" class="hidden">
+        <div class="stat-box" style="text-align: center;">
+            <h2 id="pony-name" style="margin:0; color: var(--primary);"></h2>
+            <p id="pony-rank" style="font-weight: bold; color: var(--secondary);"></p>
         </div>
-        <div class="stat-box">
-            <h2 id="char-name" style="text-align: center; color: var(--primary);"></h2>
-            <p id="char-rank" style="text-align: center; font-weight: bold;"></p>
-        </div>
-        <div id="skills-list" class="stat-box"></div>
-        <button id="btn-learn">🧠 EVOLUCIONAR IA</button>
+        <div id="skills-ia" class="stat-box"></div>
+        <button id="btn-save" style="background: #ffcc00;">💾 GUARDAR Y AMAR</button>
+        <button onclick="location.reload()" style="background: #aaa;">VOLVER</button>
     </div>
 </div>
 
 <div id="love-screen" class="hidden">
-    <div class="heart">💖</div>
+    <div class="heart">❤️</div>
     <div class="love-msg">TE AMO AMOR</div>
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MLP: Neural Network v13.5</title>
-    <style>
-        :root { --primary: #ff77bc; --secondary: #b377ff; --accent: #77e5ff; --bg: #fff5f9; --card: #ffffff; --text: #5a4a5e; }
-        body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 15px; box-sizing: border-box; }
-        #app-container { background: var(--card); padding: 2rem; border-radius: 30px; border: 4px solid var(--secondary); box-shadow: 0 15px 40px rgba(179, 119, 255, 0.15); width: 100%; max-width: 550px; text-align: center; }
-        .hidden { display: none !important; }
-        input { width: 100%; padding: 15px; margin: 10px 0; border: 2px solid var(--accent); border-radius: 50px; text-align: center; font-size: 1.1rem; outline: none; box-sizing: border-box; }
-        button { width: 100%; padding: 16px; background: var(--secondary); color: white; border: none; border-radius: 50px; cursor: pointer; font-weight: bold; text-transform: uppercase; margin-top: 12px; transition: 0.3s; font-size: 0.9rem; }
-        .q-text { color: var(--secondary); font-size: 1.1rem; font-weight: bold; margin-bottom: 25px; text-align: left; border-left: 4px solid var(--primary); padding-left: 15px; line-height: 1.5; }
-        .opt-btn { background: white; color: var(--text); border: 2px solid var(--accent); text-transform: none; text-align: left; font-weight: normal; }
-        .stat-box { border: 2px dashed var(--primary); padding: 15px; margin: 15px 0; background: #fff9fc; border-radius: 15px; text-align: left; }
-        #love-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 10000; display: flex; flex-direction: column; justify-content: center; align-items: center; animation: fadeIn 0.5s ease; }
-        .heart { font-size: 7rem; animation: beat 0.8s infinite; color: #ff4b4b; cursor: pointer; }
-        .love-msg { font-size: 3rem; font-family: 'cursive'; color: var(--primary); margin-top: 20px; }
-        @keyframes beat { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.2); } }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    </style>
-</head>
-<body>
-
-<div id="app-container">
-    <h1 style="color: var(--primary);">🧠 NEURAL NETWORK v13.5</h1>
-
-    <div id="screen-network">
-        <h3 style="color: var(--secondary);">RED DE APRENDIZAJE</h3>
-        <div id="user-list" style="margin-bottom: 20px;"></div>
-        <button id="btn-create">✨ NUEVA SINAPSIS</button>
-    </div>
-
-    <div id="screen-login" class="hidden">
-        <input type="text" id="name-input" placeholder="NOMBRE DEL PONI" autocomplete="off">
-        <button id="btn-start">CONECTAR IA</button>
-    </div>
-
-    <div id="screen-test" class="hidden">
-        <div id="q-content" class="q-text"></div>
-        <div id="options-grid" style="display: flex; flex-direction: column; gap: 8px;"></div>
-    </div>
-
-    <div id="screen-profile" class="hidden">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-            <button onclick="location.reload()" style="width:auto; padding:5px 15px;">RED</button>
-            <button id="btn-save" style="width:auto; padding:5px 15px; background:#ffcc00;">💾 GUARDAR</button>
-        </div>
-        <div class="stat-box">
-            <h2 id="char-name" style="text-align: center; color: var(--primary);"></h2>
-            <p id="char-rank" style="text-align: center; font-weight: bold;"></p>
-        </div>
-        <div id="skills-list" class="stat-box"></div>
-        <button id="btn-learn">🧠 EVOLUCIONAR IA</button>
-    </div>
-</div>
-
-<div id="love-screen" class="hidden">
-    <div class="heart">💖</div>
-    <div class="love-msg">TE AMO AMOR</div>
+    <button onclick="location.reload()" style="width: auto; padding: 10px 40px; margin-top: 30px;">REINICIAR RED</button>
 </div>
 
 <script>
-    document.addEventListener("DOMContentLoaded", () => {
-        let database = JSON.parse(localStorage.getItem('mlp_neural_db')) || [];
-        let activeChar = null, qIdx = 0, tempName = "";
+    const canvas = document.getElementById('canvas'), ctx = canvas.getContext('2d');
+    let w, h, particles = [];
+    function initCanvas() { w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; }
+    window.onresize = initCanvas; initCanvas();
 
-        // GENERADOR DE PREGUNTAS INFINITAS
-        function createIAQuestion() {
-            const concepts = ["un cristal", "una nube", "un espejo", "una estrella"];
-            const actions = ["brilla con", "emite ecos de", "desvanece", "absorbe"];
-            const feelings = ["tristeza cósmica", "magia pura", "sueños perdidos", "amor infinito"];
-            
-            const q = `De pronto, ${concepts[Math.floor(Math.random()*4)]} ${actions[Math.floor(Math.random()*4)]} ${feelings[Math.floor(Math.random()*4)]}. ¿Cómo reaccionaría tu núcleo ante esto?`;
-            const opts = [
-                "Lo acepto y lo transformo en luz.",
-                "Protejo mi corazón de su influencia.",
-                "Busco el equilibrio con mis amigos.",
-                "Dejo que mi magia fluya libremente.",
-                "Intento comprender su origen oculto."
-            ].sort(() => Math.random() - 0.5);
+    class Particle {
+        constructor() { this.x = Math.random()*w; this.y = Math.random()*h; this.s = Math.random()*2; this.v = Math.random()*0.5; }
+        draw() { ctx.fillStyle = "rgba(179, 119, 255, 0.5)"; ctx.beginPath(); ctx.arc(this.x, this.y, this.s, 0, Math.PI*2); ctx.fill(); this.y -= this.v; if(this.y < 0) this.y = h; }
+    }
+    for(let i=0; i<100; i++) particles.push(new Particle());
+    function anim() { ctx.clearRect(0,0,w,h); particles.forEach(p => p.draw()); requestAnimationFrame(anim); } anim();
 
-            return { q, opts };
+    // --- LÓGICA DE IA ---
+    let db = JSON.parse(localStorage.getItem('mlp_aether_db')) || [];
+    let curPony = null, qCount = 0;
+
+    function buildIAQuestion() {
+        const S = ["Un cometa de azúcar", "El susurro del Bosque", "Un cristal prohibido", "La sombra de un sueño"];
+        const V = ["despierta", "consume", "fragmenta", "ilumina"];
+        const C = ["tu memoria", "la armonía", "el espacio", "tu destino"];
+        const q = `${S[Math.floor(Math.random()*4)]} ${V[Math.floor(Math.random()*4)]} ${C[Math.floor(Math.random()*4)]}. ¿Cómo reacciona tu núcleo?`;
+        
+        const os = ["Canalizo amor puro para sanarlo.", "Uso mi voluntad para crear un escudo.", "Busco la verdad oculta tras el caos.", "Me fusiono con la energía del cambio.", "Pido ayuda a mis amigos del alma."];
+        return { q, os: os.sort(() => Math.random()-0.5) };
+    }
+
+    function buildIASkill() {
+        const p = ["Nexo", "Resonancia", "Velo", "Cénit", "Eco"];
+        const m = ["Dimensional", "Estelar", "de Almas", "Eterno"];
+        const e = ["permite ver el futuro", "anula la tristeza", "crea luz infinita", "conecta corazones"];
+        return { n: `${p[Math.floor(Math.random()*5)]} ${m[Math.floor(Math.random()*4)]}`, d: `IA generó: Esta magia ${e[Math.floor(Math.random()*4)]}.` };
+    }
+
+    const screens = { net: 'screen-net', test: 'screen-test', res: 'screen-res' };
+    function show(s) { Object.values(screens).forEach(x => document.getElementById(x).classList.add('hidden')); document.getElementById(s).classList.remove('hidden'); }
+
+    document.getElementById('btn-new').onclick = () => {
+        let n = prompt("Nombre del Poni:"); if(!n) return;
+        curPony = { n, r: "Calculando...", s: [], id: Date.now() };
+        qCount = 0; show(screens.test); nextQ();
+    };
+
+    function nextQ() {
+        if(qCount >= 5) { 
+            curPony.r = "Alicornio Aether"; curPony.s.push(buildIASkill()); 
+            db.push(curPony); renderRes(); return; 
         }
-
-        // GENERADOR DE HABILIDADES ÚNICAS
-        function createIASkill() {
-            const names = ["Fulgor Estelar", "Eco de Cristal", "Vínculo Eterno", "Prisma de Almas"];
-            const effects = ["controla el tiempo", "siente corazones lejanos", "anula la oscuridad", "crea puentes de luz"];
-            return { n: names[Math.floor(Math.random()*4)], d: `IA aprendió: Esta habilidad ${effects[Math.floor(Math.random()*4)]}.` };
-        }
-
-        const ui = { net: 'screen-network', log: 'screen-login', test: 'screen-test', pro: 'screen-profile' };
-        function show(s) { Object.values(ui).forEach(x => document.getElementById(x).classList.add('hidden')); document.getElementById(s).classList.remove('hidden'); }
-
-        document.getElementById('btn-create').onclick = () => show(ui.log);
-
-        document.getElementById('btn-start').onclick = () => {
-            tempName = document.getElementById('name-input').value.trim();
-            if(!tempName) return;
-            activeChar = { name: tempName, rank: "Aspirante", skills: [], id: Date.now() };
-            qIdx = 0; show(ui.test); runQuiz();
-        };
-
-        function runQuiz() {
-            if(qIdx >= 3) {
-                activeChar.rank = "Unicornio de Luz";
-                activeChar.skills.push(createIASkill());
-                database.push(activeChar);
-                save(); renderProfile(); return;
-            }
-            const data = createIAQuestion();
-            document.getElementById('q-content').innerText = data.q;
-            const grid = document.getElementById('options-grid'); grid.innerHTML = "";
-            data.opts.forEach(o => {
-                const b = document.createElement('button'); b.className = "opt-btn"; b.innerText = o;
-                b.onclick = () => { qIdx++; runQuiz(); };
-                grid.appendChild(b);
-            });
-        }
-
-        function renderProfile() {
-            show(ui.pro);
-            document.getElementById('char-name').innerText = activeChar.name.toUpperCase();
-            document.getElementById('char-rank').innerText = activeChar.rank;
-            const list = document.getElementById('skills-list'); list.innerHTML = "<strong>MEMORIA IA:</strong>";
-            activeChar.skills.forEach(s => list.innerHTML += `<p><small><strong>${s.n}</strong>: ${s.d}</small></p>`);
-        }
-
-        function save() { localStorage.setItem('mlp_neural_db', JSON.stringify(database)); }
-        document.getElementById('btn-learn').onclick = () => { activeChar.skills.push(createIASkill()); save(); renderProfile(); };
-        document.getElementById('btn-save').onclick = () => { save(); document.getElementById('love-screen').classList.remove('hidden'); };
-        document.querySelector('.heart').onclick = () => document.getElementById('love-screen').classList.add('hidden');
-
-        // Render inicial lista
-        database.forEach((c, i) => {
-            const d = document.createElement('div');
-            d.innerHTML = `<div class="stat-box" style="margin:5px 0;"><strong>${c.name}</strong> (${c.rank}) <button onclick="location.reload()" style="width:auto; padding:2px 10px; font-size:0.6rem;">VER</button></div>`;
-            document.getElementById('user-list').appendChild(d);
+        const data = buildIAQuestion();
+        document.getElementById('q-content').innerText = data.q;
+        const box = document.getElementById('options-box'); box.innerHTML = "";
+        data.os.forEach(o => {
+            const b = document.createElement('button'); b.className = "opt-btn"; b.innerText = o;
+            b.onclick = () => { qCount++; nextQ(); };
+            box.appendChild(b);
         });
+    }
+
+    function renderRes() {
+        show(screens.res);
+        document.getElementById('pony-name').innerText = curPony.n.toUpperCase();
+        document.getElementById('pony-rank').innerText = curPony.r;
+        const list = document.getElementById('skills-ia'); list.innerHTML = "<strong>HABILIDADES APRENDIDAS:</strong>";
+        curPony.s.forEach(s => list.innerHTML += `<p><small><strong>${s.n}</strong>: ${s.d}</small></p>`);
+    }
+
+    document.getElementById('btn-save').onclick = () => {
+        localStorage.setItem('mlp_aether_db', JSON.stringify(db));
+        document.getElementById('love-screen').classList.remove('hidden');
+    };
+
+    // Lista inicial
+    db.forEach(p => {
+        const item = document.createElement('div'); item.className = "stat-box";
+        item.innerHTML = `<strong>${p.n}</strong> - ${p.r}`;
+        document.getElementById('user-list').appendChild(item);
     });
 </script>
 </body>

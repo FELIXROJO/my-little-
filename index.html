@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MLP: Aether Infinity v20.0</title>
+    <title>MLP: Aether Infinity v20.1</title>
     <style>
         :root {
             --primary: #ff77bc; --secondary: #b377ff; --accent: #77e5ff;
@@ -29,6 +29,15 @@
             width: 92%; max-width: 550px; text-align: center;
             transform-style: preserve-3d;
             animation: emerge 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+            transition: transform 0.3s ease, border-color 0.3s ease;
+        }
+
+        /* Animación de Vibración Mágica */
+        .magic-vibe { animation: magicVibe 0.4s ease-out; }
+        @keyframes magicVibe {
+            0% { transform: scale(1); border-color: var(--secondary); }
+            50% { transform: scale(1.02); border-color: var(--accent); box-shadow: 0 0 100px rgba(119, 229, 255, 0.6); }
+            100% { transform: scale(1); border-color: var(--secondary); }
         }
 
         @keyframes emerge {
@@ -37,7 +46,6 @@
         }
 
         .hidden { display: none !important; }
-        
         h1 { color: var(--primary); font-size: 2rem; letter-spacing: 5px; margin-bottom: 30px; text-shadow: 3px 3px 0px #f0f0f0; font-weight: 900; }
         
         .btn-main {
@@ -49,51 +57,39 @@
             font-size: 1rem; border: 3px solid transparent;
         }
         .btn-main:hover { transform: translateY(-7px) scale(1.04); border-color: var(--accent); }
-        .btn-main:active { transform: scale(0.95); }
 
-        .q-card { text-align: left; }
         .q-text { 
             color: var(--secondary); font-size: 1.3rem; font-weight: 900; 
             margin-bottom: 35px; line-height: 1.8; border-left: 10px solid var(--primary); 
             padding: 20px; background: rgba(255, 119, 188, 0.08); border-radius: 0 25px 25px 0;
-            animation: slideRight 0.5s ease-out;
-        }
-
-        @keyframes slideRight {
-            from { opacity: 0; transform: translateX(-30px); }
-            to { opacity: 1; transform: translateX(0); }
         }
 
         .opt-btn { 
             background: #fff; color: var(--text); border: 2px solid #eee; 
             text-transform: none; text-align: left; font-weight: 600; padding: 18px 25px;
-            opacity: 0; animation: optionFade 0.5s forwards; margin-bottom: 10px;
+            opacity: 0; animation: optionFade 0.5s forwards; margin-bottom: 10px; width: 100%; cursor: pointer;
+            border-radius: 15px; transition: 0.3s;
         }
-        .opt-btn:hover { background: var(--secondary); color: white; border-color: var(--accent); transform: translateX(10px); }
+        .opt-btn:hover { background: var(--secondary); color: white; transform: translateX(10px); }
 
-        @keyframes optionFade {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        @keyframes optionFade { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
         .loading-zone { width: 100%; height: 6px; background: #f0f0f0; border-radius: 10px; margin-bottom: 25px; overflow: hidden; }
-        .loading-fill { width: 0%; height: 100%; background: var(--primary); transition: width 0.6s cubic-bezier(0.65, 0, 0.35, 1); }
+        .loading-fill { width: 0%; height: 100%; background: var(--primary); transition: width 0.6s; }
 
         .pony-card {
             background: white; border: 2px solid #f0f0f0; padding: 20px;
             border-radius: 30px; margin-bottom: 15px; display: flex;
             justify-content: space-between; align-items: center; transition: 0.3s;
         }
-        .pony-card:hover { border-color: var(--primary); box-shadow: 0 5px 15px rgba(255,119,188,0.2); }
 
         #love-curtain {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: #fff; z-index: 99999; display: flex;
             flex-direction: column; justify-content: center; align-items: center;
         }
-        .big-heart { font-size: 13rem; animation: heartBeat 0.5s infinite alternate; color: #ff4757; filter: drop-shadow(0 0 20px rgba(255,71,87,0.4)); }
+        .big-heart { font-size: 13rem; animation: heartBeat 0.5s infinite alternate; color: #ff4757; }
         .love-label { font-family: 'Brush Script MT', cursive; font-size: 5rem; color: var(--primary); margin-top: 25px; }
-        
         @keyframes heartBeat { from { transform: scale(1); } to { transform: scale(1.2); } }
     </style>
 </head>
@@ -103,7 +99,7 @@
 
 <div id="stage">
     <div id="scr-menu" class="engine-window">
-        <h1>🦄 AETHER v20</h1>
+        <h1>🦄 AETHER v20.1</h1>
         <div id="pony-list" style="max-height: 380px; overflow-y: auto; padding: 10px; margin-bottom: 20px;"></div>
         <button id="btn-create" class="btn-main">✨ GENERAR NUEVA LEYENDA</button>
     </div>
@@ -121,12 +117,12 @@
             <div class="loading-zone"><div id="test-progress" class="loading-fill"></div></div>
             <p id="q-count" style="color:var(--primary); font-size:0.9rem; font-weight:900; margin-bottom:10px;"></p>
             <div id="q-box" class="q-text"></div>
-            <div id="opt-stack" style="display: flex; flex-direction: column;"></div>
+            <div id="opt-stack"></div>
         </div>
     </div>
 
     <div id="scr-final" class="engine-window hidden">
-        <div style="background: var(--bg); padding: 30px; border-radius: 40px; margin-bottom: 30px; box-shadow: inset 0 0 20px rgba(179,119,255,0.3);">
+        <div style="background: var(--bg); padding: 30px; border-radius: 40px; margin-bottom: 30px;">
             <h2 id="final-name" style="margin:0; color:var(--primary); font-size: 2.2rem;"></h2>
             <p id="final-rank" style="color:var(--accent); font-weight:900; margin-top:10px; text-transform: uppercase; letter-spacing: 2px;"></p>
         </div>
@@ -142,7 +138,6 @@
 </div>
 
 <script>
-    // --- MOTOR VISUAL AETHER ---
     const canvas = document.getElementById('canvas-bg'), ctx = canvas.getContext('2d');
     let w, h, stars = [];
     function setup() { w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; }
@@ -150,16 +145,11 @@
     for(let i=0; i<180; i++) stars.push({x: Math.random()*w, y: Math.random()*h, r: Math.random()*1.5 + 0.5, o: Math.random(), v: Math.random()*0.3});
     function render() {
         ctx.fillStyle = '#050505'; ctx.fillRect(0,0,w,h);
-        stars.forEach(s => {
-            s.y -= s.v; if(s.y < 0) s.y = h;
-            ctx.globalAlpha = s.o; ctx.fillStyle = '#ff77bc';
-            ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI*2); ctx.fill();
-        });
+        stars.forEach(s => { s.y -= s.v; if(s.y < 0) s.y = h; ctx.globalAlpha = s.o; ctx.fillStyle = '#ff77bc'; ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI*2); ctx.fill(); });
         requestAnimationFrame(render);
     } render();
 
-    // --- LÓGICA DE IA GENERATIVA (ESPAÑOL TOTAL) ---
-    let store = JSON.parse(localStorage.getItem('mlp_aether_v20')) || [];
+    let store = JSON.parse(localStorage.getItem('mlp_aether_v20_1')) || [];
     let active = null, step = 0;
 
     const lexicon = {
@@ -169,8 +159,12 @@
     };
 
     let session = { s: [], v: [], o: [] };
-
     function shuffle(arr) { return arr.sort(() => Math.random() - 0.5); }
+
+    function pulse() {
+        const win = document.querySelector('.engine-window:not(.hidden)');
+        if(win) { win.classList.add('magic-vibe'); setTimeout(() => win.classList.remove('magic-vibe'), 400); }
+    }
 
     function prepareSession() {
         session.s = shuffle([...lexicon.sujetos]);
@@ -179,16 +173,11 @@
     }
 
     function buildStep() {
-        const s = session.s.pop();
-        const v = session.v.pop();
-        const o = session.o.pop();
+        const s = session.s.pop(), v = session.v.pop(), o = session.o.pop();
         const question = `${s} ${v} ${o}. ¿Cómo reacciona tu magia ante este evento?`;
-        
         let options = [];
         for(let i=0; i<5; i++) {
-            const rs = session.s.pop(); 
-            const rv = session.v.pop();
-            const ro = session.o.pop();
+            const rs = session.s.pop(), rv = session.v.pop(), ro = session.o.pop();
             options.push(`Decido canalizar ${rs.toLowerCase()} para intentar ${rv} ${ro}.`);
         }
         return { q: question, opts: shuffle(options) };
@@ -203,8 +192,7 @@
     const views = { menu: 'scr-menu', auth: 'scr-auth', test: 'scr-test', final: 'scr-final', love: 'love-curtain' };
     function go(id) { 
         Object.values(views).forEach(v => document.getElementById(v).classList.add('hidden')); 
-        const win = document.getElementById(id); win.classList.remove('hidden');
-        win.style.animation = 'none'; win.offsetHeight; win.style.animation = null; 
+        document.getElementById(id).classList.remove('hidden'); 
     }
 
     function refreshList() {
@@ -217,23 +205,25 @@
         });
     }
 
-    window.openEntry = (i) => { active = store[i]; renderFinal(); };
-
-    document.getElementById('btn-create').onclick = () => go(views.auth);
+    window.openEntry = (i) => { pulse(); active = store[i]; setTimeout(renderFinal, 400); };
+    document.getElementById('btn-create').onclick = () => { pulse(); setTimeout(() => go(views.auth), 400); };
     document.getElementById('btn-cancel').onclick = () => go(views.menu);
 
     document.getElementById('btn-ritual').onclick = () => {
         const name = document.getElementById('name-input').value.trim();
-        if(!name) return alert("Identificación necesaria.");
-        active = { n: name, r: "Buscando Destino...", s: [], id: Date.now() };
-        step = 0; prepareSession();
-        go(views.test); runLoop();
+        if(!name) return;
+        pulse();
+        setTimeout(() => {
+            active = { n: name, r: "Buscando Destino...", s: [], id: Date.now() };
+            step = 0; prepareSession(); go(views.test); runLoop();
+        }, 400);
     };
 
     function runLoop() {
         document.getElementById('test-progress').style.width = ((step) / 5 * 100) + "%";
         if(step >= 5) {
-            active.r = "Alicornio de Aether";
+            const razas = ["Unicornio de Luz", "Pegaso Estelar", "Terrestre de Cristal", "Alicornio de Aether"];
+            active.r = razas[Math.floor(Math.random() * razas.length)];
             active.s.push(buildSkill());
             store.push(active); renderFinal(); return;
         }
@@ -241,11 +231,10 @@
         document.getElementById('q-count').innerText = `SINAPSIS PONY ${step + 1} / 5`;
         document.getElementById('q-box').innerText = data.q;
         const stack = document.getElementById('opt-stack'); stack.innerHTML = "";
-        
         data.opts.forEach((o, i) => {
             const b = document.createElement('button'); b.className = 'opt-btn'; b.innerText = o;
             b.style.animationDelay = (i * 0.1) + "s";
-            b.onclick = () => { step++; runLoop(); }; 
+            b.onclick = () => { pulse(); setTimeout(() => { step++; runLoop(); }, 400); }; 
             stack.appendChild(b);
         });
     }
@@ -261,15 +250,19 @@
     }
 
     document.getElementById('btn-evolve').onclick = () => {
-        if(active.s.length < 3) { active.s.push(buildSkill()); renderFinal(); }
+        pulse();
+        setTimeout(() => { if(active.s.length < 3) { active.s.push(buildSkill()); renderFinal(); } }, 400);
     };
 
     document.getElementById('btn-save').onclick = () => {
-        const idx = store.findIndex(p => p.id === active.id);
-        if(idx !== -1) store[idx] = active;
-        localStorage.setItem('mlp_aether_v20', JSON.stringify(store));
-        go(views.love);
-        setTimeout(() => { go(views.menu); refreshList(); }, 5000);
+        pulse();
+        setTimeout(() => {
+            const idx = store.findIndex(p => p.id === active.id);
+            if(idx !== -1) store[idx] = active;
+            localStorage.setItem('mlp_aether_v20_1', JSON.stringify(store));
+            go(views.love);
+            setTimeout(() => { go(views.menu); refreshList(); }, 5000);
+        }, 400);
     };
 
     refreshList();

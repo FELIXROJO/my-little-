@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MLP: Aether Infinity v22.6</title>
+    <title>MLP: Aether Infinity v22.8</title>
     <style>
         :root {
             --primary: #ff77bc; --secondary: #b377ff; --accent: #77e5ff;
@@ -11,13 +11,12 @@
         }
         body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: var(--bg); font-family: 'Segoe UI', system-ui, sans-serif; }
         #canvas-bg { position: fixed; top: 0; left: 0; z-index: 1; pointer-events: none; }
-        
         #stage { position: relative; z-index: 10; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; perspective: 1500px; }
 
         .window {
             background: var(--card); padding: 2.5rem; border-radius: 40px; border: 6px solid var(--secondary);
             box-shadow: 0 25px 70px rgba(179, 119, 255, 0.5); width: 90%; max-width: 520px; text-align: center;
-            animation: emerge 0.6s cubic-bezier(0.17, 0.67, 0.8, 1); transform-style: preserve-3d;
+            animation: emerge 0.6s cubic-bezier(0.17, 0.67, 0.8, 1);
         }
 
         .magic-vibe { animation: magicVibe 0.4s ease-out; }
@@ -28,24 +27,22 @@
         button {
             padding: 18px; border: none; border-radius: 50px; margin: 8px 0; cursor: pointer; font-weight: 900;
             background: linear-gradient(135deg, var(--secondary), var(--primary)); color: white; width: 100%;
-            text-transform: uppercase; transition: 0.3s; box-shadow: 0 5px 15px rgba(179, 119, 255, 0.3);
+            text-transform: uppercase; transition: 0.3s;
         }
 
         .opt { background: white; color: var(--text); border: 2px solid #eee; text-transform: none; font-weight: 500; text-align: left; }
-        .opt:hover { border-color: var(--primary); background: #fff9fc; }
-
         .loading-bar { width: 100%; height: 8px; background: #eee; border-radius: 10px; margin-bottom: 20px; overflow: hidden; }
         .loading-fill { width: 0%; height: 100%; background: var(--primary); transition: width 0.4s; }
 
-        /* Consola Estilo Discord */
+        /* CONSOLA */
         #console {
-            position: fixed; right: -350px; top: 0; width: 320px; height: 100%;
-            background: #2f3136; border-left: 4px solid var(--primary);
-            color: #dcddde; font-family: 'Consolas', monospace; padding: 20px;
-            z-index: 100000; transition: 0.5s ease; box-sizing: border-box;
+            position: fixed; right: -360px; top: 0; width: 330px; height: 100%;
+            background: #1a1b1e; border-left: 5px solid var(--primary);
+            color: #00ff9d; font-family: 'Consolas', monospace; padding: 25px;
+            z-index: 200000; transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1); box-sizing: border-box;
         }
-        #console.active-box { right: 0 !important; box-shadow: -10px 0 50px rgba(0,0,0,0.9); }
-        .console-input { width: 100%; background: #40444b; border: 1px solid #555; color: white; padding: 10px; border-radius: 5px; margin-top: 10px; outline: none; }
+        #console.active-box { right: 0 !important; box-shadow: -20px 0 60px rgba(0,0,0,0.9); }
+        .console-input { width: 100%; background: #2c2e33; border: 1px solid #444; color: #00ff9d; padding: 12px; border-radius: 5px; margin-top: 15px; outline: none; }
 
         #love { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 99999; display: flex; flex-direction: column; justify-content: center; align-items: center; }
         .heart { font-size: 10rem; animation: beat 0.6s infinite; color: #ff4b4b; }
@@ -58,10 +55,9 @@
 
 <div id="stage">
     <div id="menu" class="window">
-        <h2 id="title-trigger" style="color:var(--primary); cursor:pointer;">AETHER INFINITY v22.6</h2>
+        <h2 id="title-trigger" style="color:var(--primary); cursor:help; user-select:none;">AETHER INFINITY v22.8</h2>
         <div id="list" style="max-height: 300px; overflow-y: auto; margin-bottom: 15px;"></div>
         <button onclick="nav('create')">✨ CREAR PONY</button>
-        <p style="font-size: 0.6rem; color: #999; margin-top: 10px;">Presiona F2 para consola</p>
     </div>
 
     <div id="create" class="window hidden">
@@ -73,7 +69,6 @@
 
     <div id="test" class="window hidden">
         <div class="loading-bar"><div id="load-fill" class="loading-fill"></div></div>
-        <div id="q-progress" style="font-size: 0.8rem; color: var(--primary); font-weight: bold; margin-bottom: 10px;"></div>
         <div id="q-box" style="text-align: left; line-height: 1.5; font-weight: bold; color: var(--secondary); margin-bottom: 20px;"></div>
         <div id="options"></div>
     </div>
@@ -87,8 +82,8 @@
 </div>
 
 <div id="console">
-    <div style="font-weight:bold; color:white; border-bottom:1px solid var(--primary);">🛡️ DISCORD CORE v22.6</div>
-    <div id="console-logs" style="height: 70%; overflow-y: auto; background: #202225; padding: 10px; margin-top:10px; font-size:0.75rem;"></div>
+    <div style="font-weight:bold; color:white; border-bottom:1px solid var(--primary); padding-bottom:10px;">🛡️ ROOT_ACCESS_v22.8</div>
+    <div id="console-logs" style="height: 65%; overflow-y: auto; background: #000; padding: 10px; margin-top:10px; font-size:0.75rem;"></div>
     <input type="password" id="pass-in" class="console-input" placeholder="Password (6663)">
     <input type="text" id="cmd-in" class="console-input hidden" placeholder="Ej: /clear, /rank [nom] [rango]">
 </div>
@@ -105,12 +100,12 @@
     window.onresize = setup; setup();
     for(let i=0; i<150; i++) stars.push({x: Math.random()*w, y: Math.random()*h, r: Math.random()*1.5, v: Math.random()*0.4});
     function render() {
-        ctx.fillStyle = '#050505'; ctx.fillRect(0,0,w,h);
-        ctx.fillStyle = '#ff77bc'; stars.forEach(s => { s.y -= s.v; if(s.y<0) s.y=h; ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI*2); ctx.fill(); });
+        ctx.fillStyle = '#050505'; ctx.fillRect(0,0,w,h); ctx.fillStyle = '#ff77bc';
+        stars.forEach(s => { s.y -= s.v; if(s.y<0) s.y=h; ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI*2); ctx.fill(); });
         requestAnimationFrame(render);
     } render();
 
-    let db = JSON.parse(localStorage.getItem("mlp_aether_v22_6")) || [];
+    let db = JSON.parse(localStorage.getItem("mlp_aether_v22_8")) || [];
     let cur = null, step = 0;
     const lexicon = {
         s: ["Un cristal mágico", "La sombra de Luna", "El eco del bosque", "Un sueño lúcido", "La brisa lunar", "El mapa antiguo", "La aurora boreal", "Un cometa estelar"],
@@ -133,26 +128,22 @@
 
     function run() {
         document.getElementById("load-fill").style.width = (step / 5 * 100) + "%";
-        document.getElementById("q-progress").innerText = `SINAPSIS ${step + 1} / 5`;
         if(step >= 5) { finish(); return; }
         const s = pool.s.pop(), v = pool.v.pop(), o = pool.o.pop();
         document.getElementById("q-box").innerText = `${s} ${v} ${o}. ¿Cómo actúa tu esencia?`;
         const box = document.getElementById("options"); box.innerHTML = "";
-        const ops = [`Protejo ${o} con magia.`, `Me adapto a ${v} con valor.`, `Busco equilibrio en ${s.toLowerCase()}.`, `Guío ${o} hacia la luz.`, `Sano ${o} con amistad.`].sort(()=>Math.random()-0.5);
+        const ops = [`Protejo ${o}.`, `Me adapto a ${v}.`, `Sano ${o}.`, `Guío ${o}.`].sort(()=>Math.random()-0.5);
         ops.forEach(t => {
             const b = document.createElement("button"); b.className = "opt"; b.innerText = t;
-            b.onclick = () => { 
-                document.getElementById('test').classList.add('magic-vibe');
-                setTimeout(() => { document.getElementById('test').classList.remove('magic-vibe'); step++; run(); }, 400);
-            };
+            b.onclick = () => { document.getElementById('test').classList.add('magic-vibe'); setTimeout(() => { document.getElementById('test').classList.remove('magic-vibe'); step++; run(); }, 400); };
             box.appendChild(b);
         });
     }
 
     function finish() {
-        const races = ["Unicornio Arcano", "Pegaso Guerrero", "Terrestre de Cristal", "Alicornio Legendario"];
+        const races = ["Unicornio", "Pegaso", "Terrestre", "Alicornio"];
         cur.race = races[Math.floor(Math.random()*races.length)];
-        cur.skills = [["Resonancia Estelar", "Nexo de Cristal", "Pulso de Armonía"][Math.floor(Math.random()*3)]];
+        cur.skills = [["Nexo Estelar", "Pulso de Armonía"][Math.floor(Math.random()*2)]];
         renderRes();
     }
 
@@ -165,7 +156,7 @@
     }
 
     function save() {
-        db.push(cur); localStorage.setItem("mlp_aether_v22_6", JSON.stringify(db));
+        db.push(cur); localStorage.setItem("mlp_aether_v22_8", JSON.stringify(db));
         document.getElementById('love').classList.remove('hidden');
         setTimeout(() => { document.getElementById('love').classList.add('hidden'); refresh(); nav('menu'); }, 5000);
     }
@@ -174,55 +165,55 @@
         const list = document.getElementById('list'); list.innerHTML = "";
         db.forEach((p, i) => {
             list.innerHTML += `<div class="opt" style="padding:15px; margin-bottom:10px; border-radius:20px; display:flex; justify-content:space-between; border-left: 5px solid ${p.rank === 'Admin' ? '#5865f2' : '#eee'};">
-                <span><b>${p.name}</b><br><small>${p.race}</small></span>
-                <button onclick="del(${i})" style="width:auto; padding:5px 10px; font-size:0.6rem; background:#ff4b4b; border:none; border-radius:5px; color:white;">X</button></div>`;
+                <span><b>${p.name}</b> (${p.race})</span>
+                <button onclick="del(${i})" style="width:auto; padding:5px; background:#ff4b4b; color:white; border:none; border-radius:5px;">X</button></div>`;
         });
     }
-    function del(i) { db.splice(i, 1); localStorage.setItem("mlp_aether_v22_6", JSON.stringify(db)); refresh(); }
+    function del(i) { db.splice(i, 1); localStorage.setItem("mlp_aether_v22_8", JSON.stringify(db)); refresh(); }
 
-    // --- ACTIVADOR F2 (AÑADIDO) ---
+    // --- ACTIVADORES CONSOLA (F2 / CLIC LARGO / SECRET) ---
     window.addEventListener('keydown', (e) => {
-        if (e.key === "F2") {
-            e.preventDefault(); // Evita funciones del sistema
-            openConsole();
-        }
+        if(e.key === "F2") { e.preventDefault(); openConsole(); }
+        checkSecret(e.key);
     });
 
-    function openConsole() {
-        const c = document.getElementById('console');
-        c.style.right = "0px"; c.id = "console-active-box";
-        log("Consola F2 Activada.");
+    let secret = "";
+    function checkSecret(k) {
+        secret += k.toLowerCase();
+        if(secret.includes("admin")) { openConsole(); secret = ""; }
+        if(secret.length > 10) secret = secret.substring(1);
     }
 
-    function log(msg) {
-        const l = document.getElementById('console-logs');
-        l.innerHTML += `<div><span style="color:#5865f2;">[LOG]</span> ${msg}</div>`;
-        l.scrollTop = l.scrollHeight;
+    let pressTimer;
+    document.getElementById('title-trigger').onmousedown = () => { pressTimer = window.setTimeout(openConsole, 2000); };
+    document.getElementById('title-trigger').onmouseup = () => { clearTimeout(pressTimer); };
+
+    function openConsole() {
+        const c = document.getElementById('console'); c.style.right = "0px"; c.id = "console-active-box";
+        log("Consola Root v22.8 Activada.");
     }
+
+    function log(m) { const l = document.getElementById('console-logs'); l.innerHTML += `<div>> ${m}</div>`; l.scrollTop = l.scrollHeight; }
 
     document.getElementById('pass-in').onkeydown = (e) => {
         if(e.key === 'Enter') {
-            if(e.target.value === "6663") {
-                e.target.classList.add('hidden');
-                document.getElementById('cmd-in').classList.remove('hidden');
-                log("Acceso concedido.");
-            } else { log("⚠️ Error."); e.target.value = ""; }
+            if(e.target.value === "6663") { e.target.classList.add('hidden'); document.getElementById('cmd-in').classList.remove('hidden'); log("ACCESO CONCEDIDO."); }
+            else { log("ERROR."); e.target.value = ""; }
         }
     };
 
     document.getElementById('cmd-in').onkeydown = (e) => {
         if(e.key === 'Enter') {
             const f = e.target.value; const a = f.split(" "); const c = a[0].toLowerCase();
-            if(c === "/clear") { db = []; localStorage.clear(); log("Base de datos borrada."); refresh(); }
+            if(c === "/clear") { db = []; localStorage.clear(); log("DB Borrada."); refresh(); }
             else if(c === "/rank") {
                 let p = db.find(x => x.name.toLowerCase() === a[1]?.toLowerCase());
-                if(p) { p.rank = a[2]; localStorage.setItem("mlp_aether_v22_6", JSON.stringify(db)); log(`Rango de ${a[1]} a ${a[2]}`); refresh(); }
+                if(p) { p.rank = a[2]; localStorage.setItem("mlp_aether_v22_8", JSON.stringify(db)); log("Rango cambiado."); refresh(); }
             }
-            else if(c === "/exit") { const x = document.getElementById('console-active-box'); x.style.right = "-350px"; setTimeout(()=>x.id="console", 500); }
+            else if(c === "/exit") { const x = document.getElementById('console-active-box'); x.style.right = "-360px"; setTimeout(()=>x.id="console", 500); }
             e.target.value = "";
         }
     };
-
     refresh();
 </script>
 </body>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MLP: Aether Infinity v22.8</title>
+    <title>MLP: Aether Infinity v22.9</title>
     <style>
         :root {
             --primary: #ff77bc; --secondary: #b377ff; --accent: #77e5ff;
@@ -16,7 +16,7 @@
         .window {
             background: var(--card); padding: 2.5rem; border-radius: 40px; border: 6px solid var(--secondary);
             box-shadow: 0 25px 70px rgba(179, 119, 255, 0.5); width: 90%; max-width: 520px; text-align: center;
-            animation: emerge 0.6s cubic-bezier(0.17, 0.67, 0.8, 1);
+            animation: emerge 0.6s cubic-bezier(0.17, 0.67, 0.8, 1); transform-style: preserve-3d;
         }
 
         .magic-vibe { animation: magicVibe 0.4s ease-out; }
@@ -39,7 +39,7 @@
             position: fixed; right: -360px; top: 0; width: 330px; height: 100%;
             background: #1a1b1e; border-left: 5px solid var(--primary);
             color: #00ff9d; font-family: 'Consolas', monospace; padding: 25px;
-            z-index: 200000; transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1); box-sizing: border-box;
+            z-index: 200000; transition: 0.5s; box-sizing: border-box;
         }
         #console.active-box { right: 0 !important; box-shadow: -20px 0 60px rgba(0,0,0,0.9); }
         .console-input { width: 100%; background: #2c2e33; border: 1px solid #444; color: #00ff9d; padding: 12px; border-radius: 5px; margin-top: 15px; outline: none; }
@@ -55,7 +55,7 @@
 
 <div id="stage">
     <div id="menu" class="window">
-        <h2 id="title-trigger" style="color:var(--primary); cursor:help; user-select:none;">AETHER INFINITY v22.8</h2>
+        <h2 style="color:var(--primary)">AETHER INFINITY v22.9</h2>
         <div id="list" style="max-height: 300px; overflow-y: auto; margin-bottom: 15px;"></div>
         <button onclick="nav('create')">✨ CREAR PONY</button>
     </div>
@@ -82,7 +82,7 @@
 </div>
 
 <div id="console">
-    <div style="font-weight:bold; color:white; border-bottom:1px solid var(--primary); padding-bottom:10px;">🛡️ ROOT_ACCESS_v22.8</div>
+    <div style="font-weight:bold; color:white; border-bottom:1px solid var(--primary); padding-bottom:10px;">🛡️ ROOT_ACCESS_v22.9</div>
     <div id="console-logs" style="height: 65%; overflow-y: auto; background: #000; padding: 10px; margin-top:10px; font-size:0.75rem;"></div>
     <input type="password" id="pass-in" class="console-input" placeholder="Password (6663)">
     <input type="text" id="cmd-in" class="console-input hidden" placeholder="Ej: /clear, /rank [nom] [rango]">
@@ -105,7 +105,7 @@
         requestAnimationFrame(render);
     } render();
 
-    let db = JSON.parse(localStorage.getItem("mlp_aether_v22_8")) || [];
+    let db = JSON.parse(localStorage.getItem("mlp_aether_v22_9")) || [];
     let cur = null, step = 0;
     const lexicon = {
         s: ["Un cristal mágico", "La sombra de Luna", "El eco del bosque", "Un sueño lúcido", "La brisa lunar", "El mapa antiguo", "La aurora boreal", "Un cometa estelar"],
@@ -156,7 +156,7 @@
     }
 
     function save() {
-        db.push(cur); localStorage.setItem("mlp_aether_v22_8", JSON.stringify(db));
+        db.push(cur); localStorage.setItem("mlp_aether_v22_9", JSON.stringify(db));
         document.getElementById('love').classList.remove('hidden');
         setTimeout(() => { document.getElementById('love').classList.add('hidden'); refresh(); nav('menu'); }, 5000);
     }
@@ -169,28 +169,22 @@
                 <button onclick="del(${i})" style="width:auto; padding:5px; background:#ff4b4b; color:white; border:none; border-radius:5px;">X</button></div>`;
         });
     }
-    function del(i) { db.splice(i, 1); localStorage.setItem("mlp_aether_v22_8", JSON.stringify(db)); refresh(); }
+    function del(i) { db.splice(i, 1); localStorage.setItem("mlp_aether_v22_9", JSON.stringify(db)); refresh(); }
 
-    // --- ACTIVADORES CONSOLA (F2 / CLIC LARGO / SECRET) ---
-    window.addEventListener('keydown', (e) => {
-        if(e.key === "F2") { e.preventDefault(); openConsole(); }
-        checkSecret(e.key);
-    });
-
-    let secret = "";
-    function checkSecret(k) {
-        secret += k.toLowerCase();
-        if(secret.includes("admin")) { openConsole(); secret = ""; }
-        if(secret.length > 10) secret = secret.substring(1);
-    }
-
-    let pressTimer;
-    document.getElementById('title-trigger').onmousedown = () => { pressTimer = window.setTimeout(openConsole, 2000); };
-    document.getElementById('title-trigger').onmouseup = () => { clearTimeout(pressTimer); };
+    // --- EL ACTIVADOR LEGACY QUE FUNCIONA ---
+    window.addEventListener('keydown', function(e) {
+        if (e.key === "F2" || e.keyCode === 113) {
+            e.preventDefault(); // Anula la función del sistema
+            e.stopPropagation();
+            openConsole();
+        }
+    }, true); // Captura en fase inicial
 
     function openConsole() {
-        const c = document.getElementById('console'); c.style.right = "0px"; c.id = "console-active-box";
-        log("Consola Root v22.8 Activada.");
+        const c = document.getElementById('console');
+        c.style.right = "0px";
+        c.id = "console-active-box";
+        log("Consola Root v22.9 Activada.");
     }
 
     function log(m) { const l = document.getElementById('console-logs'); l.innerHTML += `<div>> ${m}</div>`; l.scrollTop = l.scrollHeight; }
@@ -208,7 +202,7 @@
             if(c === "/clear") { db = []; localStorage.clear(); log("DB Borrada."); refresh(); }
             else if(c === "/rank") {
                 let p = db.find(x => x.name.toLowerCase() === a[1]?.toLowerCase());
-                if(p) { p.rank = a[2]; localStorage.setItem("mlp_aether_v22_8", JSON.stringify(db)); log("Rango cambiado."); refresh(); }
+                if(p) { p.rank = a[2]; localStorage.setItem("mlp_aether_v22_9", JSON.stringify(db)); log("Rango cambiado."); refresh(); }
             }
             else if(c === "/exit") { const x = document.getElementById('console-active-box'); x.style.right = "-360px"; setTimeout(()=>x.id="console", 500); }
             e.target.value = "";

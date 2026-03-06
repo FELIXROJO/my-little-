@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Aether Infinity v21</title>
+<title>Aether Infinity</title>
 
 <style>
 
@@ -33,9 +33,10 @@ background:white;
 color:black;
 padding:30px;
 border-radius:30px;
-width:500px;
+width:520px;
 max-width:90%;
 text-align:center;
+animation:fadeIn .5s;
 }
 
 .hidden{display:none;}
@@ -50,6 +51,11 @@ font-weight:bold;
 background:linear-gradient(135deg,var(--secondary),var(--primary));
 color:white;
 width:100%;
+transition:.2s;
+}
+
+button:hover{
+transform:scale(1.05);
 }
 
 .opt{
@@ -70,6 +76,43 @@ border-radius:15px;
 margin:10px 0;
 }
 
+#progressBar{
+width:100%;
+height:8px;
+background:#eee;
+border-radius:10px;
+overflow:hidden;
+margin-bottom:10px;
+}
+
+#progressFill{
+height:100%;
+width:0%;
+background:linear-gradient(90deg,var(--primary),var(--accent));
+transition:.4s;
+}
+
+#progressText{
+font-size:14px;
+margin-bottom:10px;
+font-weight:bold;
+}
+
+.magic{
+animation:magic .3s;
+}
+
+@keyframes magic{
+0%{transform:scale(1)}
+50%{transform:scale(1.03)}
+100%{transform:scale(1)}
+}
+
+@keyframes fadeIn{
+from{opacity:0;transform:translateY(20px)}
+to{opacity:1}
+}
+
 </style>
 </head>
 
@@ -78,11 +121,13 @@ margin:10px 0;
 <div id="stage">
 
 <div id="menu" class="window">
+
 <h2>AETHER INFINITY</h2>
 
 <div id="list"></div>
 
 <button onclick="newPony()">Crear Pony</button>
+
 </div>
 
 <div id="create" class="window hidden">
@@ -101,7 +146,11 @@ margin:10px 0;
 
 <div id="test" class="window hidden">
 
-<div id="progress"></div>
+<div id="progressBar">
+<div id="progressFill"></div>
+</div>
+
+<div id="progressText"></div>
 
 <h3 id="question"></h3>
 
@@ -140,11 +189,11 @@ let step = 0
 
 const questions = [
 
-{q:"Un portal mágico aparece frente a ti",type:"magic"},
-{q:"Un amigo necesita ayuda",type:"kind"},
-{q:"Una tormenta amenaza la ciudad",type:"power"},
-{q:"Descubres un cristal antiguo",type:"magic"},
-{q:"Un enemigo desafía tu destino",type:"power"}
+{q:"Un portal mágico aparece frente a ti"},
+{q:"Un amigo necesita ayuda"},
+{q:"Una tormenta amenaza la ciudad"},
+{q:"Descubres un cristal antiguo"},
+{q:"Un enemigo desafía tu destino"}
 
 ]
 
@@ -169,9 +218,9 @@ document.getElementById(id).classList.remove("hidden")
 
 function startTest(){
 
-const name = document.getElementById("name").value
+const name = document.getElementById("name").value.trim()
 
-if(!name)return
+if(!name) return
 
 active = {
 name:name,
@@ -192,17 +241,17 @@ run()
 
 function run(){
 
+updateProgress()
+
 if(step>=questions.length){
 
 finish()
-
 return
 
 }
 
-const q = questions[step]
-
-document.getElementById("question").innerText=q.q
+document.getElementById("question").innerText =
+questions[step].q
 
 const box=document.getElementById("options")
 
@@ -224,11 +273,19 @@ b.innerText=text
 
 b.onclick=()=>{
 
+document.getElementById("test").classList.add("magic")
+
+setTimeout(()=>{
+
+document.getElementById("test").classList.remove("magic")
+
 active[type]++
 
 step++
 
 run()
+
+},200)
 
 }
 
@@ -236,23 +293,42 @@ document.getElementById("options").appendChild(b)
 
 }
 
+function updateProgress(){
+
+const percent = (step/questions.length)*100
+
+document.getElementById("progressFill").style.width = percent+"%"
+
+document.getElementById("progressText").innerText =
+"Pregunta "+(step+1)+" / "+questions.length
+
+}
+
 function finish(){
 
 let race=""
 
-if(active.magic>active.power) race="Unicornio Arcano"
-else if(active.power>active.magic) race="Pegaso Guerrero"
-else race="Alicornio Legendario"
+if(active.magic>active.power && active.magic>active.kind)
+race="Unicornio Arcano"
+
+else if(active.power>active.magic && active.power>active.kind)
+race="Pegaso Guerrero"
+
+else if(active.kind>active.power)
+race="Pony de la Armonía"
+
+else
+race="Alicornio Legendario"
 
 active.race=race
 
 active.level = Math.floor(Math.random()*10)+1
 
 active.skills.push(skill())
-
 active.skills.push(skill())
 
-story()
+active.story =
+"Un pony cuyo destino fue marcado por la magia de Equestria."
 
 render()
 
@@ -266,18 +342,12 @@ const names=[
 "Nexo de Cristal",
 "Pulso de Armonía",
 "Alma Prismática",
-"Tormenta Celestial"
+"Tormenta Celestial",
+"Llama Astral"
 
 ]
 
 return names[Math.floor(Math.random()*names.length)]
-
-}
-
-function story(){
-
-active.story =
-"Un pony cuyo destino fue marcado por la magia de Equestria. Su espíritu mezcla valor, amistad y poder."
 
 }
 
@@ -286,11 +356,8 @@ function render(){
 show("result")
 
 document.getElementById("r_name").innerText=active.name
-
 document.getElementById("r_race").innerText=active.race
-
 document.getElementById("r_level").innerText="Nivel mágico: "+active.level
-
 document.getElementById("r_story").innerText=active.story
 
 const s=document.getElementById("r_skills")
@@ -300,9 +367,7 @@ s.innerHTML=""
 active.skills.forEach(v=>{
 
 const d=document.createElement("div")
-
 d.className="card"
-
 d.innerText=v
 
 s.appendChild(d)

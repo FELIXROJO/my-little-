@@ -2,507 +2,263 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Equestria Character Generator & Mini-Game</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Pony Creator Mobile</title>
     <style>
-        /* --- CSS: INTERFAZ Y ESTILOS DE JUEGO --- */
         :root {
-            --bg-dark: #121212;
-            --bg-panel: #1e1e1e;
-            --primary: #6a1b9a; /* Twilight */
+            --primary: #6a1b9a;
             --accent: #ff4081;
-            --text: #e0e0e0;
-            --font-main: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            --bg: #0f0f0f;
+            --card: #1e1e1e;
         }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
         body {
             margin: 0;
-            padding: 0;
-            background-color: var(--bg-dark);
-            color: var(--text);
-            font-family: var(--font-main);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background: var(--bg);
+            color: white;
             display: flex;
             flex-direction: column;
             height: 100vh;
             overflow: hidden;
         }
 
-        header {
-            background: var(--primary);
-            padding: 10px 20px;
-            text-align: center;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-            z-index: 10;
-        }
-
-        header h1 { margin: 0; font-size: 1.5rem; text-transform: uppercase; letter-spacing: 2px; }
-
-        /* Contenedor Principal */
-        #game-container {
-            display: flex;
+        /* Área de Visualización (Arriba) */
+        #viewport {
             flex: 1;
-            overflow: hidden;
-        }
-
-        /* Panel de Selección (Izquierda) */
-        #selection-panel {
-            width: 300px;
-            background: var(--bg-panel);
-            padding: 20px;
-            border-right: 2px solid #333;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            overflow-y: auto;
-        }
-
-        .panel-title { font-size: 1.1rem; color: var(--accent); font-weight: bold; margin-bottom: 10px; border-bottom: 1px solid #333; padding-bottom: 5px;}
-
-        .character-option {
-            background: rgba(255,255,255,0.05);
-            border: 2px solid transparent;
-            border-radius: 8px;
-            padding: 10px;
-            cursor: pointer;
-            transition: 0.3s;
+            position: relative;
+            background: radial-gradient(circle, #2c3e50, #000);
             display: flex;
             align-items: center;
-            gap: 10px;
+            justify-content: center;
         }
 
-        .character-option:hover { background: rgba(255,255,255,0.1); transform: translateX(5px); }
-        .character-option.selected { border-color: var(--accent); background: rgba(255,64,129,0.1); }
-
-        .color-dot { width: 20px; height: 20px; border-radius: 50%; border: 1px solid #fff; }
-
-        .control-group { display: flex; flex-direction: column; gap: 5px; margin-top: 10px;}
-        label { font-size: 0.9rem; color: #aaa; }
-        
-        input[type="color"] { border: none; width: 100%; height: 30px; cursor: pointer; background: none; }
-        input[type="range"] { width: 100%; cursor: pointer; accent-color: var(--accent); }
-
-        button#generate-btn {
-            background: var(--accent);
-            color: white;
-            border: none;
-            padding: 12px;
-            border-radius: 5px;
-            font-size: 1rem;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: auto;
-            transition: 0.3s;
-            text-transform: uppercase;
+        canvas {
+            max-width: 100%;
+            max-height: 100%;
+            touch-action: none;
         }
-        button#generate-btn:hover { background: #ff79b0; transform: scale(1.03); }
 
-        /* Área de Visualización (Centro/Derecha) */
-        #display-area {
-            flex: 1;
+        /* Panel de Controles (Abajo) */
+        #controls {
+            height: 45vh;
+            background: var(--card);
+            border-top: 3px solid var(--primary);
+            padding: 15px;
+            overflow-y: auto;
+            border-radius: 20px 20px 0 0;
+            box-shadow: 0 -5px 20px rgba(0,0,0,0.5);
+        }
+
+        .scroll-x {
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+            scrollbar-width: none;
+        }
+        .scroll-x::-webkit-scrollbar { display: none; }
+
+        .pony-btn {
+            flex: 0 0 80px;
+            height: 80px;
+            background: #333;
+            border-radius: 15px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 20px;
-            background: radial-gradient(circle, #2c3e50 0%, #121212 100%);
-            position: relative;
+            border: 2px solid transparent;
+            font-size: 10px;
+            text-align: center;
+            transition: 0.2s;
         }
 
-        #canvas-wrapper {
-            position: relative;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
-            border-radius: 10px;
-            overflow: hidden;
-            background: #000; /* Fondo del canvas antes de cargar */
+        .pony-btn.active { border-color: var(--accent); background: #444; }
+
+        .dot { width: 30px; height: 30px; border-radius: 50%; margin-bottom: 5px; border: 2px solid white; }
+
+        .custom-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 15px;
         }
 
-        canvas {
-            display: block;
-            /* El tamaño se maneja en JS */
+        label { display: block; font-size: 12px; color: #aaa; margin-bottom: 5px; text-transform: uppercase; }
+
+        input[type="color"] {
+            width: 100%; height: 45px; border: none; background: #333; border-radius: 10px; padding: 5px;
         }
 
-        #status-overlay {
+        input[type="range"] { width: 100%; accent-color: var(--accent); margin-top: 10px; }
+
+        #gen-btn {
+            width: 100%;
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 16px;
+            margin-top: 20px;
+            box-shadow: 0 4px 15px rgba(255, 64, 129, 0.3);
+        }
+
+        #status {
             position: absolute;
-            bottom: 20px;
-            left: 20px;
-            background: rgba(0,0,0,0.7);
-            padding: 10px 20px;
-            border-radius: 5px;
-            font-family: 'Courier New', monospace;
-            font-size: 0.9rem;
-            color: #00ff00;
-            border-left: 3px solid #00ff00;
+            top: 10px;
+            left: 10px;
+            font-family: monospace;
+            font-size: 10px;
+            color: #0f0;
+            background: rgba(0,0,0,0.5);
+            padding: 5px;
             pointer-events: none;
         }
-
     </style>
 </head>
 <body>
 
-    <header>
-        <h1>Equestria Character Engine</h1>
-    </header>
+    <div id="viewport">
+        <div id="status">> ENGINE_READY<br>> V: 2.0_MOBILE</div>
+        <canvas id="ponyCanvas"></canvas>
+    </div>
 
-    <div id="game-container">
-        
-        <aside id="selection-panel">
-            <div class="panel-title">1. Selecciona Base</div>
-            <div id="character-list">
-                </div>
+    <div id="controls">
+        <label>Selecciona Personaje Base</label>
+        <div class="scroll-x" id="ponyList"></div>
 
-            <div class="panel-title">2. Personalizar</div>
-            
-            <div class="control-group">
-                <label>Color de Cuerpo</label>
-                <input type="color" id="bodyColorPicker" value="#D19FE8">
+        <div class="custom-section">
+            <div>
+                <label>Color Cuerpo</label>
+                <input type="color" id="bodyColor" value="#D19FE8">
             </div>
-
-            <div class="control-group">
-                <label>Color de Melena</label>
-                <input type="color" id="maneColorPicker" value="#6a1b9a">
+            <div>
+                <label>Color Melena</label>
+                <input type="color" id="maneColor" value="#6a1b9a">
             </div>
+        </div>
 
-            <div class="control-group">
-                <label>Intensidad de Poder (<span id="power-val">50</span>%)</label>
-                <input type="range" id="powerSlider" min="10" max="100" value="50">
-            </div>
+        <div style="margin-top:15px;">
+            <label>Nivel de Magia: <span id="pwr-text">50</span>%</label>
+            <input type="range" id="power" min="0" max="100" value="50">
+        </div>
 
-            <button id="generate-btn">Generar Imagen</button>
-        </aside>
-
-        <main id="display-area">
-            <div id="canvas-wrapper">
-                <canvas id="ponyCanvas" width="800" height="600"></canvas>
-            </div>
-            
-            <div id="status-overlay">
-                > Sistema: Online<br>
-                > Sujeto: Esperando Generación...
-            </div>
-        </main>
+        <button id="gen-btn">GENERAR EN TIEMPO REAL</button>
     </div>
 
     <script>
-        /* --- JAVASCRIPT: MOTOR DE GENERACIÓN PROCEDIMENTAL --- */
+        const canvas = document.getElementById('ponyCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Ajuste de resolución para pantallas Retina/High-DPI
+        function resize() {
+            const size = Math.min(window.innerWidth, window.innerHeight * 0.5);
+            canvas.width = size * 2;
+            canvas.height = size * 2;
+            canvas.style.width = size + 'px';
+            canvas.style.height = size + 'px';
+        }
+        window.onresize = resize;
+        resize();
 
-        // 1. Base de Datos de Personajes (Mane 6)
-        const characters = [
-            { id: 'twilight', name: "Twilight Sparkle", body: "#D19FE8", mane: "#6a1b9a", element: "Magic" },
-            { id: 'applejack', name: "Applejack", body: "#F39C12", mane: "#FDFEFE", element: "Honesty" },
-            { id: 'rainbow', name: "Rainbow Dash", body: "#2980B9", mane: "#C0392B", element: "Loyalty" }, // Simplificado rojo base
-            { id: 'rarity', name: "Rarity", body: "#FFFFFF", mane: "#4A235A", element: "Generosity" },
-            { id: 'fluttershy', name: "Fluttershy", body: "#F7DC6F", mane: "#F5B7B1", element: "Kindness" },
-            { id: 'pinkie', name: "Pinkie Pie", body: "#FF69B4", mane: "#C71585", element: "Laughter" }
+        const data = [
+            { id: 'twi', name: 'Twilight', body: '#D19FE8', mane: '#6a1b9a' },
+            { id: 'aj', name: 'Applejack', body: '#F39C12', mane: '#FDFEFE' },
+            { id: 'rd', name: 'Rainbow', body: '#2980B9', mane: '#C0392B' },
+            { id: 'rar', name: 'Rarity', body: '#FFFFFF', mane: '#4A235A' },
+            { id: 'fs', name: 'Flutter', body: '#F7DC6F', mane: '#F5B7B1' },
+            { id: 'pp', name: 'Pinkie', body: '#FF69B4', mane: '#C71585' }
         ];
 
-        // 2. Estado del "Juego"
-        let gameState = {
-            selectedCharacterId: characters[0].id,
-            bodyColor: characters[0].body,
-            maneColor: characters[0].mane,
-            powerLevel: 50,
-            canvas: null,
-            ctx: null
-        };
+        let selected = data[0];
 
-        // 3. Inicialización
-        window.onload = function() {
-            gameState.canvas = document.getElementById('ponyCanvas');
-            gameState.ctx = gameState.canvas.getContext('2d');
+        // Crear botones
+        const list = document.getElementById('ponyList');
+        data.forEach(p => {
+            const btn = document.createElement('div');
+            btn.className = 'pony-btn' + (p.id === 'twi' ? ' active' : '');
+            btn.innerHTML = `<div class="dot" style="background:${p.body}"></div>${p.name}`;
+            btn.onclick = () => {
+                document.querySelectorAll('.pony-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                selected = p;
+                document.getElementById('bodyColor').value = p.body;
+                document.getElementById('maneColor').value = p.mane;
+                draw();
+            };
+            list.appendChild(btn);
+        });
+
+        function draw() {
+            const bCol = document.getElementById('bodyColor').value;
+            const mCol = document.getElementById('maneColor').value;
+            const pwr = document.getElementById('power').value;
+            document.getElementById('pwr-text').innerText = pwr;
+
+            const w = canvas.width;
+            const h = canvas.height;
+            const s = w / 400; // Factor de escala
+
+            ctx.clearRect(0,0,w,h);
             
-            populateCharacterList();
-            setupEventListeners();
-            
-            // Generación inicial
-            generatePonyImage();
-        };
-
-        // 4. Funciones de Interfaz (UI)
-        function populateCharacterList() {
-            const listContainer = document.getElementById('character-list');
-            characters.forEach(char => {
-                const option = document.createElement('div');
-                option.className = `character-option ${char.id === gameState.selectedCharacterId ? 'selected' : ''}`;
-                option.id = `opt-${char.id}`;
-                option.onclick = () => selectCharacter(char.id);
-
-                option.innerHTML = `
-                    <div class="color-dot" style="background: ${char.body};"></div>
-                    <div>
-                        <div style="font-weight:bold;">${char.name}</div>
-                        <div style="font-size:0.8rem; color:#aaa;">${char.element}</div>
-                    </div>
-                `;
-                listContainer.appendChild(option);
-            });
-        }
-
-        function selectCharacter(id) {
-            // Actualizar UI de selección
-            document.querySelectorAll('.character-option').forEach(el => el.classList.remove('selected'));
-            document.getElementById(`opt-${id}`).classList.add('selected');
-
-            // Actualizar Estado
-            gameState.selectedCharacterId = id;
-            const charData = characters.find(c => c.id === id);
-            
-            // Actualizar selectores de color con los base del personaje
-            gameState.bodyColor = charData.body;
-            gameState.maneColor = charData.mane;
-            document.getElementById('bodyColorPicker').value = charData.body;
-            document.getElementById('maneColorPicker').value = charData.mane;
-            
-            // Cambiar color principal de la UI según el pony
-            document.documentElement.style.setProperty('--primary', charData.body);
-            
-            updateStatus(`Sujeto Base Cambiado a: ${charData.name}`);
-        }
-
-        function setupEventListeners() {
-            document.getElementById('bodyColorPicker').addEventListener('input', (e) => gameState.bodyColor = e.target.value);
-            document.getElementById('maneColorPicker').addEventListener('input', (e) => gameState.maneColor = e.target.value);
-            document.getElementById('powerSlider').addEventListener('input', (e) => {
-                gameState.powerLevel = e.target.value;
-                document.getElementById('power-val').innerText = e.target.value;
-            });
-            document.getElementById('generate-btn').addEventListener('click', generatePonyImage);
-        }
-
-        function updateStatus(msg) {
-            const charName = characters.find(c => c.id === gameState.selectedCharacterId).name;
-            document.getElementById('status-overlay').innerHTML = `> Sistema: Online<br>> Sujeto: ${charName}<br>> ${msg}`;
-        }
-
-
-        /* --- 5. MOTOR GRÁFICO (Canvas Procedimental) --- */
-        // Aquí empieza la "magia" de generar imágenes con código.
-
-        function generatePonyImage() {
-            const { ctx, canvas, bodyColor, maneColor, powerLevel, selectedCharacterId } = gameState;
-            const charData = characters.find(c => c.id === selectedCharacterId);
-
-            updateStatus("Generando... Combinando Capas Bio-Digitales...");
-
-            // Limpiar Canvas
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            // A. DIBUJAR FONDO (Atmósfera según poder)
-            drawBackground(ctx, canvas, charData.element, powerLevel);
-
-            // Configuración base de dibujo
-            ctx.save();
-            ctx.translate(canvas.width / 2 - 150, canvas.height / 2 + 100); // Centrar pony (aproximado)
-            ctx.scale(1.5, 1.5); // Agrandar
-
-            // B. DIBUJAR CUERPO BASE (Procedimental)
-            drawPonyBody(ctx, bodyColor);
-
-            // C. DIBUJAR MELENA Y COLA (Específico por personaje o color personalizado)
-            drawPonyHair(ctx, maneColor, selectedCharacterId);
-
-            // D. DIBUJAR CARA (Ojos fijos básicos)
-            drawPonyFace(ctx);
-
-            // E. DIBUJAR CUTIE MARK (Representación simple)
-            drawCutieMark(ctx, selectedCharacterId);
-
-            ctx.restore();
-
-            // F. EFECTOS ESPECIALES (Poder)
-            drawPowerEffects(ctx, canvas, bodyColor, powerLevel);
-
-            updateStatus("Generación Completada. Render Estable.");
-        }
-
-        // --- Sub-Funciones de Dibujo ---
-
-        function drawBackground(ctx, canvas, element, power) {
-            // Fondo degradado
-            const gradient = ctx.createRadialGradient(canvas.width/2, canvas.height/2, 50, canvas.width/2, canvas.height/2, canvas.width/1.2);
-            gradient.addColorStop(0, "#2c3e50");
-            gradient.addColorStop(1, "#0a0a0a");
-            ctx.fillStyle = gradient;
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            // Partículas de "Eter" basadas en el poder
-            ctx.fillStyle = `rgba(255, 255, 255, ${power / 200})`;
-            for(let i=0; i<power; i++) {
-                ctx.beginPath();
-                ctx.arc(Math.random() * canvas.width, Math.random() * canvas.height, Math.random() * 2, 0, Math.PI*2);
-                ctx.fill();
+            // Aura de poder
+            if(pwr > 10) {
+                ctx.shadowBlur = pwr * s;
+                ctx.shadowColor = mCol;
             }
-        }
 
-        function drawPonyBody(ctx, color) {
-            ctx.fillStyle = color;
-            ctx.strokeStyle = "#000";
-            ctx.lineWidth = 2;
+            ctx.save();
+            ctx.translate(w/2 - 50*s, h/2 + 50*s);
 
-            // Patas traseras
-            drawEllipse(ctx, 40, 10, 15, 60, 0.1); // Pata trasera der
-            drawEllipse(ctx, 20, 15, 15, 60, 0);   // Pata trasera izq
-
-            // Cuerpo (Tronco)
-            drawEllipse(ctx, 80, -30, 60, 40, 0);
-
-            // Patas delanteras
-            drawEllipse(ctx, 110, 15, 13, 55, -0.1); // Delantera der
-            drawEllipse(ctx, 130, 10, 13, 55, 0);    // Delantera izq
-
-            // Cuello
-            drawEllipse(ctx, 135, -70, 20, 45, 0.4);
-
-            // Cabeza
-            drawEllipse(ctx, 150, -110, 40, 35, 0);
-            
-            // Oreja (Simple)
+            // Cuerpo
+            ctx.fillStyle = bCol;
+            // Pata trasera
+            ctx.fillRect(0, 0, 30*s, 80*s);
+            // Pata delantera
+            ctx.fillRect(80*s, 0, 30*s, 80*s);
+            // Torso
             ctx.beginPath();
-            ctx.moveTo(130, -135);
-            ctx.lineTo(145, -160);
-            ctx.lineTo(160, -140);
+            ctx.ellipse(55*s, -20*s, 60*s, 40*s, 0, 0, Math.PI*2);
+            ctx.fill();
+            // Cuello y Cabeza
+            ctx.beginPath();
+            ctx.ellipse(100*s, -80*s, 35*s, 40*s, 0, 0, Math.PI*2);
+            ctx.fill();
+
+            // Melena
+            ctx.fillStyle = mCol;
+            ctx.beginPath();
+            ctx.moveTo(70*s, -110*s);
+            ctx.lineTo(130*s, -140*s);
+            ctx.lineTo(150*s, -80*s);
+            ctx.lineTo(100*s, -60*s);
             ctx.closePath();
             ctx.fill();
-            ctx.stroke();
-        }
 
-        function drawPonyHair(ctx, color, characterId) {
-            ctx.fillStyle = color;
-            ctx.strokeStyle = "#000";
-            ctx.lineWidth = 2;
+            // Ojo
+            ctx.fillStyle = "white";
+            ctx.beginPath();
+            ctx.arc(115*s, -90*s, 8*s, 0, Math.PI*2);
+            ctx.fill();
+            ctx.fillStyle = "black";
+            ctx.beginPath();
+            ctx.arc(118*s, -90*s, 4*s, 0, Math.PI*2);
+            ctx.fill();
 
-            // Lógica para formas de pelo específicas (simplificadas vectorialmente)
-            switch(characterId) {
-                case 'twilight':
-                    // Melena geométrica con flequillo
-                    ctx.beginPath();
-                    ctx.moveTo(110, -120);
-                    ctx.lineTo(100, -180); // Arriba
-                    ctx.lineTo(180, -180);
-                    ctx.lineTo(195, -120); // Flequillo
-                    ctx.bezierCurveTo(150, -100, 130, -100, 110, -120);
-                    ctx.closePath();
-                    ctx.fill(); ctx.stroke();
-                    // Raya rosa ( Twilight específica )
-                    ctx.fillStyle = "#FF69B4";
-                    ctx.fillRect(140, -180, 10, 55);
-                    break;
-                
-                case 'pinkie':
-                    // Pelo esponjoso (Círculos superpuestos)
-                    ctx.fillStyle = color;
-                    drawCircle(ctx, 120, -150, 30);
-                    drawCircle(ctx, 150, -170, 35);
-                    drawCircle(ctx, 180, -150, 30);
-                    drawCircle(ctx, 190, -120, 25);
-                    // Cola
-                    drawCircle(ctx, 10, -50, 30);
-                    drawCircle(ctx, -10, -20, 25);
-                    break;
-
-                default: // Base genérica spiky para el resto en esta versión beta
-                    ctx.beginPath();
-                    ctx.moveTo(120, -140);
-                    ctx.lineTo(90, -200);
-                    ctx.lineTo(150, -180);
-                    ctx.lineTo(210, -160);
-                    ctx.lineTo(190, -110);
-                    ctx.closePath();
-                    ctx.fill(); ctx.stroke();
-                    break;
-            }
-        }
-
-        function drawPonyFace(ctx) {
-            // Ojo (Básico)
-            ctx.fillStyle = "#fff";
-            drawEllipse(ctx, 170, -120, 10, 15, 0); // Globo oculcar
-            ctx.fillStyle = "#000";
-            drawCircle(ctx, 175, -120, 5); // Pupila
-        }
-
-        function drawCutieMark(ctx, characterId) {
-            ctx.save();
-            ctx.translate(60, -30); // Posición en la cadera
-            ctx.scale(0.5, 0.5);
-
-            switch(characterId) {
-                case 'twilight':
-                    ctx.fillStyle = "white"; // Estrella simplificada
-                    drawStar(ctx, 0, 0, 5, 30, 15);
-                    break;
-                case 'applejack':
-                    ctx.fillStyle = "red"; // Manzana simplificada
-                    drawCircle(ctx, 0, 0, 15);
-                    ctx.fillStyle = "green"; ctx.fillRect(-2, -20, 4, 10);
-                    break;
-                default: 
-                    ctx.fillStyle = "rgba(255,255,255,0.3)"; // Marcador de posición
-                    drawCircle(ctx, 0, 0, 10);
-            }
             ctx.restore();
+            ctx.shadowBlur = 0;
         }
 
-        function drawPowerEffects(ctx, canvas, color, power) {
-            if(power < 30) return;
-
-            const centerX = canvas.width / 2;
-            const centerY = canvas.height / 2;
-            
-            ctx.shadowBlur = power / 2;
-            ctx.shadowColor = color;
-            ctx.strokeStyle = color;
-            ctx.lineWidth = 2 + (power/20);
-
-            // Aura alrededor del pony
-            ctx.beginPath();
-            ctx.ellipse(centerX, centerY - 20, 150 + (power/2), 200 + (power/2), 0, 0, Math.PI*2);
-            ctx.stroke();
-            
-            ctx.shadowBlur = 0; // Reset
-        }
-
-
-        // --- UTILIDADES GRÁFICAS DE GEOMETRÍA ---
-
-        function drawEllipse(ctx, x, y, radiusX, radiusY, rotation) {
-            ctx.beginPath();
-            ctx.ellipse(x, y, radiusX, radiusY, rotation, 0, 2 * Math.PI);
-            ctx.fill();
-            ctx.stroke();
-        }
-
-        function drawCircle(ctx, x, y, r) {
-            ctx.beginPath();
-            ctx.arc(x, y, r, 0, Math.PI*2);
-            ctx.fill();
-            ctx.stroke();
-        }
-
-        function drawStar(ctx, cx, cy, spikes, outerRadius, innerRadius) {
-            let rot = Math.PI / 2 * 3;
-            let x = cx;
-            let y = cy;
-            let step = Math.PI / spikes;
-
-            ctx.beginPath();
-            ctx.moveTo(cx, cy - outerRadius);
-            for (let i = 0; i < spikes; i++) {
-                x = cx + Math.cos(rot) * outerRadius;
-                y = cy + Math.sin(rot) * outerRadius;
-                ctx.lineTo(x, y);
-                rot += step;
-
-                x = cx + Math.cos(rot) * innerRadius;
-                y = cy + Math.sin(rot) * innerRadius;
-                ctx.lineTo(x, y);
-                rot += step;
-            }
-            ctx.lineTo(cx, cy - outerRadius);
-            ctx.closePath();
-            ctx.fill();
-            ctx.stroke();
-        }
-
+        document.getElementById('gen-btn').onclick = draw;
+        document.getElementById('power').oninput = draw;
+        
+        // Ejecución inicial
+        setTimeout(draw, 100);
     </script>
 </body>
 </html>

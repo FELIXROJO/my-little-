@@ -3,113 +3,99 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Neural Cloud v13.6 | My Little Pony Archive</title>
+    <title>Neural Cloud v13.7 - Protocolo Bloqueado</title>
     <style>
         :root { --primary: #ff77bc; --secondary: #b377ff; --accent: #77e5ff; --bg: #fff5f9; --card: #ffffff; --text: #5a4a5e; --danger: #ff4b4b; }
-        body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', Tahoma, sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 15px; }
-        #app-container { background: var(--card); padding: 2rem; border-radius: 30px; border: 4px solid var(--secondary); box-shadow: 0 15px 40px rgba(179,119,255,0.2); width: 100%; max-width: 550px; text-align: center; }
+        body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        #app-container { background: var(--card); padding: 2rem; border-radius: 30px; border: 4px solid var(--secondary); box-shadow: 0 15px 40px rgba(0,0,0,0.1); width: 100%; max-width: 450px; text-align: center; }
         .hidden { display: none !important; }
-        .stat-box { border: 2px dashed var(--primary); padding: 20px; margin: 15px 0; background: #fff9fc; border-radius: 20px; text-align: left; }
-        button { width: 100%; padding: 16px; background: var(--secondary); color: white; border: none; border-radius: 50px; cursor: pointer; font-weight: bold; text-transform: uppercase; margin-top: 12px; box-shadow: 0 4px 0 #8a4fff; }
+        .stat-box { border: 2px dashed var(--primary); padding: 20px; margin: 15px 0; background: #fff9fc; border-radius: 20px; }
+        button { width: 100%; padding: 16px; background: var(--secondary); color: white; border: none; border-radius: 50px; cursor: pointer; font-weight: bold; margin-top: 12px; box-shadow: 0 4px 0 #8a4fff; font-size: 1rem; }
         button:active { transform: translateY(2px); box-shadow: 0 2px 0 #8a4fff; }
-        #love-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 10000; display: flex; flex-direction: column; justify-content: center; align-items: center; animation: fadeIn 0.5s ease; }
-        .heart { font-size: 7rem; animation: beat 0.8s infinite; color: #ff4b4b; cursor: pointer; }
-        .love-msg { font-size: 2.5rem; font-family: 'Brush Script MT', cursive; color: var(--primary); margin-top: 20px; }
+        #love-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 999; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        .heart { font-size: 8rem; animation: beat 0.8s infinite; color: #ff4b4b; cursor: pointer; }
         @keyframes beat { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
 <body>
 
 <div id="app-container">
-    <h1 style="color: var(--primary);">🧠 NEURAL CLOUD v13.6</h1>
-
     <div id="screen-profile">
+        <h1 style="color: var(--primary);">🧠 NEURAL CLOUD</h1>
         <div class="stat-box">
-            <h2 id="pony-name" style="margin:0; color: var(--primary); text-align: center;">RAINBOW DASH</h2>
-            <p style="text-align: center; font-weight: bold; color: var(--secondary);">Rango: Alicornio Nexus</p>
+            <strong>ARCHIVO:</strong> Poni Detectado<br>
+            <strong>ESTADO:</strong> Listo para guardar.
         </div>
-        <div class="stat-box">
-            <strong>ESTADO DE MEMORIA:</strong>
-            <p style="font-size: 0.9rem;">Los datos están listos para ser sincronizados con el núcleo.</p>
-        </div>
-        <button id="btn-save-trigger" style="background: #ffcc00; box-shadow: 0 4px 0 #ccaa00;">💾 GUARDAR EXPEDIENTE</button>
+        <button id="btn-start">💾 GUARDAR DATOS</button>
     </div>
 
     <div id="screen-questions" class="hidden">
-        <div class="stat-box" style="border-color: var(--danger); background: #fff5f5;">
-            <h2 id="q-title" style="color: var(--danger); text-align: center; margin: 0;">¿SEGURO?</h2>
-            <p id="q-counter" style="text-align: center; font-weight: bold; margin: 15px 0; color: var(--secondary); font-size: 1.2rem;"></p>
-            <button id="btn-confirm-yes" style="background: #4bff8a; box-shadow: 0 4px 0 #3db361; color: #1a5a2e;">SÍ</button>
-            <button id="btn-cancel" style="background:none; color:var(--text); box-shadow:none; font-size: 0.7rem; text-decoration: underline;">CANCELAR</button>
+        <div class="stat-box" style="border-color: var(--danger);">
+            <h2 id="q-text" style="color: var(--danger);">¿SEGURO?</h2>
+            <p id="q-counter" style="font-weight: bold; color: var(--secondary); font-size: 1.2rem;"></p>
+            <button id="btn-next">SÍ</button>
         </div>
     </div>
 </div>
 
 <div id="love-screen" class="hidden">
     <div class="heart">💖</div>
-    <div class="love-msg">¿TE CASARÍAS CONMIGO?</div>
-    <p style="margin-top: 20px; opacity: 0.5;">Verificación de seguridad exitosa.</p>
+    <h1 style="font-family: cursive; color: var(--primary);">¿TE CASARÍAS CONMIGO?</h1>
+    <p>Validación 50/50 completada.</p>
 </div>
 
 <script>
-    document.addEventListener("DOMContentLoaded", () => {
-        let confirmCount = 0;
-        const MAX_CONFIRMS = 50;
+    const state = { count: 0, max: 50 };
+    
+    const views = {
+        profile: document.getElementById('screen-profile'),
+        questions: document.getElementById('screen-questions'),
+        love: document.getElementById('love-screen')
+    };
 
-        const ui = {
-            profile: document.getElementById('screen-profile'),
-            questions: document.getElementById('screen-questions'),
-            love: document.getElementById('love-screen'),
-            title: document.getElementById('q-title'),
-            counter: document.getElementById('q-counter'),
-            btnSave: document.getElementById('btn-save-trigger'),
-            btnYes: document.getElementById('btn-confirm-yes'),
-            btnCancel: document.getElementById('btn-cancel')
-        };
+    const elements = {
+        title: document.getElementById('q-text'),
+        counter: document.getElementById('q-counter'),
+        btnStart: document.getElementById('btn-start'),
+        btnNext: document.getElementById('btn-next')
+    };
 
-        // Al dar clic en "Guardar", abrimos la pantalla de preguntas
-        ui.btnSave.onclick = () => {
-            confirmCount = 0; // Reset
-            ui.profile.classList.add('hidden');
-            ui.questions.classList.remove('hidden');
-            updateQuestionUI();
-        };
+    // 1. Iniciar proceso
+    elements.btnStart.onclick = () => {
+        views.profile.classList.add('hidden');
+        views.questions.classList.remove('hidden');
+        updateUI();
+    };
 
-        // Lógica del botón "SÍ" dentro de las preguntas
-        ui.btnYes.onclick = () => {
-            confirmCount++;
-            
-            if (confirmCount >= MAX_CONFIRMS) {
-                // SOLO AQUÍ se activa el "Cásate conmigo"
-                ui.questions.classList.add('hidden');
-                ui.love.classList.remove('hidden');
-            } else {
-                // Si no ha llegado a 50, actualizamos el texto y seguimos
-                updateQuestionUI();
-            }
-        };
+    // 2. Lógica del botón SÍ (El "Guardián")
+    elements.btnNext.onclick = () => {
+        state.count++;
 
-        function updateQuestionUI() {
-            // Requisitos de texto específicos
-            if (confirmCount === 48) {
-                ui.title.innerText = "¿SEGURO SEGURO?";
-            } else if (confirmCount >= 49) {
-                ui.title.innerText = "¿TOTALMENTE SEGURO?";
-            } else {
-                ui.title.innerText = "¿SEGURO?";
-            }
+        if (state.count >= state.max) {
+            // SOLO AQUÍ pasamos al final
+            views.questions.classList.add('hidden');
+            views.love.classList.remove('hidden');
+        } else {
+            // Si no es 50, REFRESCAMOS la misma pantalla de pregunta
+            updateUI();
+        }
+    };
 
-            ui.counter.innerText = `Confirmación ${confirmCount + 1} de ${MAX_CONFIRMS}`;
+    function updateUI() {
+        // Lógica de textos que pediste
+        if (state.count === 48) {
+            elements.title.innerText = "¿SEGURO SEGURO?";
+        } else if (state.count === 49) {
+            elements.title.innerText = "¿TOTALMENTE SEGURO?";
+        } else {
+            elements.title.innerText = "¿SEGURO?";
         }
 
-        ui.btnCancel.onclick = () => {
-            ui.questions.classList.add('hidden');
-            ui.profile.classList.remove('hidden');
-        };
+        elements.counter.innerText = `Paso ${state.count + 1} de ${state.max}`;
+    }
 
-        document.querySelector('.heart').onclick = () => location.reload();
-    });
+    document.querySelector('.heart').onclick = () => location.reload();
 </script>
+
 </body>
 </html>

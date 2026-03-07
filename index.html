@@ -3,73 +3,189 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Equestria Adventure 🦄</title>
+    <title>Equestria OS v3.0 - Mane 6 Interface</title>
     <style>
-        :root { --pink-primary: #f472b6; --pink-dark: #db2777; --bg-soft: #fdf2f8; }
-        body { background-color: var(--bg-soft); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; overflow: hidden; }
-        #game-card { background: white; border: 4px solid var(--pink-primary); padding: 30px; width: 90%; max-width: 500px; border-radius: 20px; box-shadow: 0 15px 35px rgba(219, 39, 119, 0.2); text-align: center; position: relative; }
-        #game-card::before { content: '✨'; position: absolute; top: -20px; left: 50%; transform: translateX(-50%); font-size: 2rem; }
-        #text { font-size: 1.2rem; color: #4a5568; margin-bottom: 25px; line-height: 1.6; min-height: 100px; }
-        .options-grid { display: grid; gap: 10px; }
-        .btn { background: var(--pink-primary); color: white; border: none; padding: 12px 20px; border-radius: 50px; cursor: pointer; font-weight: bold; font-size: 1rem; transition: all 0.3s ease; border-bottom: 4px solid var(--pink-dark); }
-        .btn:hover { background: var(--pink-dark); transform: translateY(-2px); border-bottom-width: 2px; margin-bottom: 2px; }
-        .btn:active { transform: translateY(2px); border-bottom-width: 0; margin-bottom: 4px; }
+        /* --- CSS: DISEÑO Y ESTILOS --- */
+        :root {
+            --primary: #6a1b9a;
+            --accent: #ff4081;
+            --bg: #121212;
+            --card-bg: #1e1e1e;
+            --text: #ffffff;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            overflow-x: hidden;
+        }
+
+        header {
+            background-color: var(--primary);
+            padding: 1rem;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        nav {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 10px;
+        }
+
+        nav button {
+            background: rgba(255,255,255,0.1);
+            border: 2px solid white;
+            color: white;
+            padding: 8px 15px;
+            cursor: pointer;
+            border-radius: 20px;
+            transition: 0.3s;
+        }
+
+        nav button:hover {
+            background: var(--accent);
+            transform: scale(1.05);
+        }
+
+        /* Simulación de Páginas */
+        .page {
+            display: none;
+            padding: 40px 20px;
+            min-height: 100vh;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .active-page { display: block; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Grid de la "Página 1" */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .pony-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            border-left: 8px solid;
+            transition: 0.3s;
+            position: relative;
+        }
+
+        .pony-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.4); }
+
+        .pony-card h2 { margin: 10px 0; font-size: 1.5rem; }
+
+        /* Estilos de la "Página 2" (Consola de Datos) */
+        .console-container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: #000;
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #333;
+            font-family: 'Courier New', Courier, monospace;
+            color: #00ff00;
+        }
+
+        .data-row {
+            border-bottom: 1px solid #222;
+            padding: 10px 0;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .tag {
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+        }
     </style>
 </head>
 <body>
 
-    <div id="game-card">
-        <div id="text">Cargando la magia de la amistad...</div>
-        <div id="options" class="options-grid"></div>
-    </div>
+    <header>
+        <h1>FRIENDSHIP CORE v2.06</h1>
+        <nav>
+            <button onclick="showPage('visual')">Vista Visual</button>
+            <button onclick="showPage('data')">Vista de Datos</button>
+        </nav>
+    </header>
+
+    <section id="page-visual" class="page active-page">
+        <h2 style="text-align: center; margin-bottom: 30px;">Directorio de la Armonía</h2>
+        <div id="grid" class="grid-container">
+            </div>
+    </section>
+
+    <section id="page-data" class="page">
+        <h2 style="text-align: center; margin-bottom: 30px; color: var(--accent);">Mane 6 Metadata (JSON Source)</h2>
+        <div class="console-container" id="console">
+            </div>
+    </section>
 
     <script>
-        const textElement = document.getElementById('text');
-        const optionsElement = document.getElementById('options');
+        /* --- JAVASCRIPT: LÓGICA Y DATOS --- */
+        const ponyData = [
+            { name: "Twilight Sparkle", element: "Magic", color: "#D19FE8", desc: "Princesa de la amistad y líder." },
+            { name: "Applejack", element: "Honesty", color: "#F39C12", desc: "Fiel trabajadora de Sweet Apple Acres." },
+            { name: "Rainbow Dash", element: "Loyalty", color: "#2980B9", desc: "La pony más veloz de toda Equestria." },
+            { name: "Rarity", element: "Generosity", color: "#FFFFFF", desc: "Diseñadora de alta costura y elegancia." },
+            { name: "Fluttershy", element: "Kindness", color: "#F7DC6F", desc: "Cuidadora de animales y alma gentil." },
+            { name: "Pinkie Pie", element: "Laughter", color: "#FF69B4", desc: "Maestra de las fiestas y la alegría." }
+        ];
 
-        const story = {
-            1: {
-                text: "🍎 ¡Bienvenida a Ponyville! Applejack te intercepta: '¡Caramelito! ¡El Gran Banquete de la Amistad empieza ya y no tenemos el postre! ¡Ayúdanos!'",
-                options: [
-                    { text: "⚡ Buscar a Rainbow Dash", next: 2 },
-                    { text: "🎈 Ir con Pinkie Pie", next: 3 }
-                ]
-            },
-            2: {
-                text: "⚡ Rainbow Dash despeja el cielo en 10 segundos. '¡Oye! Para darte las manzanas mágicas dime: ¿Cuál es el valor más fuerte de Equestria?'",
-                options: [
-                    { text: "✨ ¡La Amistad!", next: 4 },
-                    { text: "💪 ¡La Lealtad!", next: 4 }
-                ]
-            },
-            3: {
-                text: "🎈 Pinkie Pie sale de un cañón de confeti. '¡Oki Doki Lokie! Te daré el postre si admites que quien programó esto te ama mucho.'",
-                options: [
-                    { text: "💖 ¡Es el mejor novio del mundo!", next: 4 }
-                ]
-            },
-            4: {
-                text: "🏰 Llegas al castillo. Twilight Sparkle y las demás te aclaman. 'Has salvado el banquete. Eres la pony más especial de este mundo'. \n\n (Te quiero más que a todos los libros de Canterlot)",
-                options: [
-                    { text: "Reiniciar Aventura 🌈", next: 1 }
-                ]
-            }
-        };
-
-        function render(id) {
-            const node = story[id];
-            textElement.innerText = node.text;
-            optionsElement.innerHTML = '';
-            node.options.forEach(opt => {
-                const btn = document.createElement('button');
-                btn.innerText = opt.text;
-                btn.className = 'btn';
-                btn.onclick = () => render(opt.next);
-                optionsElement.appendChild(btn);
-            });
+        // Función para cambiar de "página"
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page'));
+            document.getElementById('page-' + pageId).classList.add('active-page');
         }
 
-        render(1);
+        // Renderizar Página 1 (Visual)
+        const grid = document.getElementById('grid');
+        ponyData.forEach(p => {
+            grid.innerHTML += `
+                <div class="pony-card" style="border-color: ${p.color}">
+                    <div style="background: ${p.color}; width: 50px; height: 50px; border-radius: 50%; margin: 0 auto;"></div>
+                    <h2>${p.name}</h2>
+                    <span class="tag" style="background: ${p.color}; color: ${p.name === 'Rarity' ? 'black' : 'white'}">${p.element}</span>
+                    <p>${p.desc}</p>
+                </div>
+            `;
+        });
+
+        // Renderizar Página 2 (Datos Crudos)
+        const consoleBox = document.getElementById('console');
+        ponyData.forEach(p => {
+            consoleBox.innerHTML += `
+                <div class="data-row">
+                    <span>> GET_MODULE: ${p.name.toUpperCase()}</span>
+                    <span>STATUS: <span style="color: ${p.color}">ONLINE</span></span>
+                </div>
+                <div style="font-size: 0.85rem; padding-left: 20px; margin-bottom: 10px; color: #888;">
+                    { "element": "${p.element}", "hex": "${p.color}", "sync": "Stable" }
+                </div>
+            `;
+        });
+
+        console.log("Sistema cargado satisfactoriamente.");
     </script>
 </body>
 </html>

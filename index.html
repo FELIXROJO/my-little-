@@ -2,18 +2,92 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Neural Cloud v13.7 - Protocolo Bloqueado</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Neural Cloud Mobile</title>
     <style>
-        :root { --primary: #ff77bc; --secondary: #b377ff; --accent: #77e5ff; --bg: #fff5f9; --card: #ffffff; --text: #5a4a5e; --danger: #ff4b4b; }
-        body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-        #app-container { background: var(--card); padding: 2rem; border-radius: 30px; border: 4px solid var(--secondary); box-shadow: 0 15px 40px rgba(0,0,0,0.1); width: 100%; max-width: 450px; text-align: center; }
+        :root { 
+            --primary: #ff77bc; 
+            --secondary: #b377ff; 
+            --accent: #77e5ff; 
+            --bg: #fff5f9; 
+            --card: #ffffff; 
+            --text: #5a4a5e; 
+            --danger: #ff4b4b; 
+            --success: #4bff8a;
+        }
+
+        /* Optimización para celular */
+        body { 
+            background: var(--bg); 
+            color: var(--text); 
+            font-family: 'Segoe UI', system-ui, sans-serif; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            height: 100vh; 
+            margin: 0; 
+            overflow: hidden; /* Evita scroll durante el crecimiento */
+        }
+
+        #app-container { 
+            background: var(--card); 
+            padding: 1.5rem; 
+            border-radius: 25px; 
+            border: 3px solid var(--secondary); 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1); 
+            width: 90%; 
+            max-width: 400px; 
+            text-align: center; 
+            z-index: 10;
+        }
+
         .hidden { display: none !important; }
-        .stat-box { border: 2px dashed var(--primary); padding: 20px; margin: 15px 0; background: #fff9fc; border-radius: 20px; }
-        button { width: 100%; padding: 16px; background: var(--secondary); color: white; border: none; border-radius: 50px; cursor: pointer; font-weight: bold; margin-top: 12px; box-shadow: 0 4px 0 #8a4fff; font-size: 1rem; }
-        button:active { transform: translateY(2px); box-shadow: 0 2px 0 #8a4fff; }
-        #love-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 999; display: flex; flex-direction: column; justify-content: center; align-items: center; }
-        .heart { font-size: 8rem; animation: beat 0.8s infinite; color: #ff4b4b; cursor: pointer; }
+
+        /* El botón que crece */
+        #btn-next { 
+            background: var(--success); 
+            color: #1a5a2e; 
+            border: none; 
+            border-radius: 15px; 
+            cursor: pointer; 
+            font-weight: 800; 
+            font-size: 1rem;
+            box-shadow: 0 5px 0 #3db361;
+            transition: all 0.1s ease; /* Transición rápida para celular */
+            margin-top: 20px;
+            width: auto;
+            min-width: 100px;
+            padding: 15px 30px;
+            position: relative;
+            z-index: 100;
+        }
+
+        #btn-next:active { transform: scale(0.95); }
+
+        .stat-box { 
+            border: 2px dashed var(--primary); 
+            padding: 15px; 
+            margin: 15px 0; 
+            background: #fff9fc; 
+            border-radius: 15px; 
+        }
+
+        /* Pantalla Final */
+        #love-screen { 
+            position: fixed; 
+            top: 0; left: 0; width: 100%; height: 100%; 
+            background: white; 
+            z-index: 1000; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center; 
+            padding: 20px;
+        }
+
+        .heart { font-size: 6rem; animation: beat 0.8s infinite; color: var(--danger); }
+        .love-msg { font-size: 2rem; font-family: cursive; color: var(--primary); margin-top: 20px; text-align: center; }
+
         @keyframes beat { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
     </style>
 </head>
@@ -21,80 +95,91 @@
 
 <div id="app-container">
     <div id="screen-profile">
-        <h1 style="color: var(--primary);">🧠 NEURAL CLOUD</h1>
+        <h2 style="color: var(--primary); margin-top: 0;">🧠 NEURAL MOBILE</h2>
         <div class="stat-box">
-            <strong>ARCHIVO:</strong> Poni Detectado<br>
-            <strong>ESTADO:</strong> Listo para guardar.
+            <strong>ARCHIVO:</strong> Pony_Final.dat<br>
+            <strong>ESTADO:</strong> Pendiente de Firma
         </div>
-        <button id="btn-start">💾 GUARDAR DATOS</button>
+        <button id="btn-start" style="width: 100%; padding: 15px; background: var(--secondary); color: white; border: none; border-radius: 50px; font-weight: bold; box-shadow: 0 4px 0 #8a4fff;">💾 GUARDAR AHORA</button>
     </div>
 
     <div id="screen-questions" class="hidden">
-        <div class="stat-box" style="border-color: var(--danger);">
-            <h2 id="q-text" style="color: var(--danger);">¿SEGURO?</h2>
-            <p id="q-counter" style="font-weight: bold; color: var(--secondary); font-size: 1.2rem;"></p>
+        <h3 id="q-text" style="color: var(--danger); margin-bottom: 5px;">¿SEGURO?</h3>
+        <p id="q-counter" style="font-size: 0.8rem; opacity: 0.6; margin-bottom: 20px;"></p>
+        
+        <div style="height: 300px; display: flex; justify-content: center; align-items: center;">
             <button id="btn-next">SÍ</button>
         </div>
+        
+        <p id="cancel-text" style="font-size: 0.7rem; text-decoration: underline; margin-top: 10px;">Cancelar proceso</p>
     </div>
 </div>
 
 <div id="love-screen" class="hidden">
     <div class="heart">💖</div>
-    <h1 style="font-family: cursive; color: var(--primary);">¿TE CASARÍAS CONMIGO?</h1>
-    <p>Validación 50/50 completada.</p>
+    <div class="love-msg">¿TE CASARÍAS CONMIGO?</div>
+    <button onclick="location.reload()" style="margin-top: 30px; background: none; border: none; color: var(--secondary); font-size: 0.8rem;">Reiniciar Vínculo</button>
 </div>
 
 <script>
-    const state = { count: 0, max: 50 };
-    
+    const config = { max: 50 };
+    let count = 0;
+    let btnScale = 1;
+
     const views = {
         profile: document.getElementById('screen-profile'),
         questions: document.getElementById('screen-questions'),
         love: document.getElementById('love-screen')
     };
 
-    const elements = {
+    const el = {
+        btnStart: document.getElementById('btn-start'),
+        btnNext: document.getElementById('btn-next'),
         title: document.getElementById('q-text'),
         counter: document.getElementById('q-counter'),
-        btnStart: document.getElementById('btn-start'),
-        btnNext: document.getElementById('btn-next')
+        cancel: document.getElementById('cancel-text')
     };
 
-    // 1. Iniciar proceso
-    elements.btnStart.onclick = () => {
+    el.btnStart.onclick = () => {
         views.profile.classList.add('hidden');
         views.questions.classList.remove('hidden');
         updateUI();
     };
 
-    // 2. Lógica del botón SÍ (El "Guardián")
-    elements.btnNext.onclick = () => {
-        state.count++;
+    el.btnNext.onclick = (e) => {
+        count++;
 
-        if (state.count >= state.max) {
-            // SOLO AQUÍ pasamos al final
+        if (count >= config.max) {
             views.questions.classList.add('hidden');
             views.love.classList.remove('hidden');
         } else {
-            // Si no es 50, REFRESCAMOS la misma pantalla de pregunta
+            // Aumentar escala del botón (crecimiento)
+            btnScale += 0.25; // Crece un 25% en cada clic
+            el.btnNext.style.transform = `scale(${btnScale})`;
+            
+            // A medida que crece, se vuelve más redondo para ocupar espacio
+            if (btnScale > 5) el.btnNext.style.borderRadius = "50%";
+            
             updateUI();
         }
     };
 
     function updateUI() {
-        // Lógica de textos que pediste
-        if (state.count === 48) {
-            elements.title.innerText = "¿SEGURO SEGURO?";
-        } else if (state.count === 49) {
-            elements.title.innerText = "¿TOTALMENTE SEGURO?";
+        // Lógica de textos
+        if (count === 48) {
+            el.title.innerText = "¿SEGURO SEGURO?";
+        } else if (count === 49) {
+            el.title.innerText = "¿TOTALMENTE SEGURO?";
+            el.btnNext.style.background = "#ff4b4b"; // Cambio de color final
+            el.btnNext.style.color = "white";
         } else {
-            elements.title.innerText = "¿SEGURO?";
+            el.title.innerText = "¿SEGURO?";
         }
 
-        elements.counter.innerText = `Paso ${state.count + 1} de ${state.max}`;
+        el.counter.innerText = `Validación nivel ${count + 1} de ${config.max}`;
     }
 
-    document.querySelector('.heart').onclick = () => location.reload();
+    el.cancel.onclick = () => location.reload();
 </script>
 
 </body>

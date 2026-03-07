@@ -2,185 +2,74 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Neural Cloud Mobile</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Equestria Adventure 🦄</title>
     <style>
-        :root { 
-            --primary: #ff77bc; 
-            --secondary: #b377ff; 
-            --accent: #77e5ff; 
-            --bg: #fff5f9; 
-            --card: #ffffff; 
-            --text: #5a4a5e; 
-            --danger: #ff4b4b; 
-            --success: #4bff8a;
-        }
-
-        /* Optimización para celular */
-        body { 
-            background: var(--bg); 
-            color: var(--text); 
-            font-family: 'Segoe UI', system-ui, sans-serif; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            height: 100vh; 
-            margin: 0; 
-            overflow: hidden; /* Evita scroll durante el crecimiento */
-        }
-
-        #app-container { 
-            background: var(--card); 
-            padding: 1.5rem; 
-            border-radius: 25px; 
-            border: 3px solid var(--secondary); 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1); 
-            width: 90%; 
-            max-width: 400px; 
-            text-align: center; 
-            z-index: 10;
-        }
-
-        .hidden { display: none !important; }
-
-        /* El botón que crece */
-        #btn-next { 
-            background: var(--success); 
-            color: #1a5a2e; 
-            border: none; 
-            border-radius: 15px; 
-            cursor: pointer; 
-            font-weight: 800; 
-            font-size: 1rem;
-            box-shadow: 0 5px 0 #3db361;
-            transition: all 0.1s ease; /* Transición rápida para celular */
-            margin-top: 20px;
-            width: auto;
-            min-width: 100px;
-            padding: 15px 30px;
-            position: relative;
-            z-index: 100;
-        }
-
-        #btn-next:active { transform: scale(0.95); }
-
-        .stat-box { 
-            border: 2px dashed var(--primary); 
-            padding: 15px; 
-            margin: 15px 0; 
-            background: #fff9fc; 
-            border-radius: 15px; 
-        }
-
-        /* Pantalla Final */
-        #love-screen { 
-            position: fixed; 
-            top: 0; left: 0; width: 100%; height: 100%; 
-            background: white; 
-            z-index: 1000; 
-            display: flex; 
-            flex-direction: column; 
-            justify-content: center; 
-            align-items: center; 
-            padding: 20px;
-        }
-
-        .heart { font-size: 6rem; animation: beat 0.8s infinite; color: var(--danger); }
-        .love-msg { font-size: 2rem; font-family: cursive; color: var(--primary); margin-top: 20px; text-align: center; }
-
-        @keyframes beat { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+        :root { --pink-primary: #f472b6; --pink-dark: #db2777; --bg-soft: #fdf2f8; }
+        body { background-color: var(--bg-soft); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; overflow: hidden; }
+        #game-card { background: white; border: 4px solid var(--pink-primary); padding: 30px; width: 90%; max-width: 500px; border-radius: 20px; box-shadow: 0 15px 35px rgba(219, 39, 119, 0.2); text-align: center; position: relative; }
+        #game-card::before { content: '✨'; position: absolute; top: -20px; left: 50%; transform: translateX(-50%); font-size: 2rem; }
+        #text { font-size: 1.2rem; color: #4a5568; margin-bottom: 25px; line-height: 1.6; min-height: 100px; }
+        .options-grid { display: grid; gap: 10px; }
+        .btn { background: var(--pink-primary); color: white; border: none; padding: 12px 20px; border-radius: 50px; cursor: pointer; font-weight: bold; font-size: 1rem; transition: all 0.3s ease; border-bottom: 4px solid var(--pink-dark); }
+        .btn:hover { background: var(--pink-dark); transform: translateY(-2px); border-bottom-width: 2px; margin-bottom: 2px; }
+        .btn:active { transform: translateY(2px); border-bottom-width: 0; margin-bottom: 4px; }
     </style>
 </head>
 <body>
 
-<div id="app-container">
-    <div id="screen-profile">
-        <h2 style="color: var(--primary); margin-top: 0;">🧠 NEURAL MOBILE</h2>
-        <div class="stat-box">
-            <strong>ARCHIVO:</strong> Pony_Final.dat<br>
-            <strong>ESTADO:</strong> Pendiente de Firma
-        </div>
-        <button id="btn-start" style="width: 100%; padding: 15px; background: var(--secondary); color: white; border: none; border-radius: 50px; font-weight: bold; box-shadow: 0 4px 0 #8a4fff;">💾 GUARDAR AHORA</button>
+    <div id="game-card">
+        <div id="text">Cargando la magia de la amistad...</div>
+        <div id="options" class="options-grid"></div>
     </div>
 
-    <div id="screen-questions" class="hidden">
-        <h3 id="q-text" style="color: var(--danger); margin-bottom: 5px;">¿SEGURO?</h3>
-        <p id="q-counter" style="font-size: 0.8rem; opacity: 0.6; margin-bottom: 20px;"></p>
-        
-        <div style="height: 300px; display: flex; justify-content: center; align-items: center;">
-            <button id="btn-next">SÍ</button>
-        </div>
-        
-        <p id="cancel-text" style="font-size: 0.7rem; text-decoration: underline; margin-top: 10px;">Cancelar proceso</p>
-    </div>
-</div>
+    <script>
+        const textElement = document.getElementById('text');
+        const optionsElement = document.getElementById('options');
 
-<div id="love-screen" class="hidden">
-    <div class="heart">💖</div>
-    <div class="love-msg">¿TE CASARÍAS CONMIGO?</div>
-    <button onclick="location.reload()" style="margin-top: 30px; background: none; border: none; color: var(--secondary); font-size: 0.8rem;">Reiniciar Vínculo</button>
-</div>
+        const story = {
+            1: {
+                text: "🍎 ¡Bienvenida a Ponyville! Applejack te intercepta: '¡Caramelito! ¡El Gran Banquete de la Amistad empieza ya y no tenemos el postre! ¡Ayúdanos!'",
+                options: [
+                    { text: "⚡ Buscar a Rainbow Dash", next: 2 },
+                    { text: "🎈 Ir con Pinkie Pie", next: 3 }
+                ]
+            },
+            2: {
+                text: "⚡ Rainbow Dash despeja el cielo en 10 segundos. '¡Oye! Para darte las manzanas mágicas dime: ¿Cuál es el valor más fuerte de Equestria?'",
+                options: [
+                    { text: "✨ ¡La Amistad!", next: 4 },
+                    { text: "💪 ¡La Lealtad!", next: 4 }
+                ]
+            },
+            3: {
+                text: "🎈 Pinkie Pie sale de un cañón de confeti. '¡Oki Doki Lokie! Te daré el postre si admites que quien programó esto te ama mucho.'",
+                options: [
+                    { text: "💖 ¡Es el mejor novio del mundo!", next: 4 }
+                ]
+            },
+            4: {
+                text: "🏰 Llegas al castillo. Twilight Sparkle y las demás te aclaman. 'Has salvado el banquete. Eres la pony más especial de este mundo'. \n\n (Te quiero más que a todos los libros de Canterlot)",
+                options: [
+                    { text: "Reiniciar Aventura 🌈", next: 1 }
+                ]
+            }
+        };
 
-<script>
-    const config = { max: 50 };
-    let count = 0;
-    let btnScale = 1;
-
-    const views = {
-        profile: document.getElementById('screen-profile'),
-        questions: document.getElementById('screen-questions'),
-        love: document.getElementById('love-screen')
-    };
-
-    const el = {
-        btnStart: document.getElementById('btn-start'),
-        btnNext: document.getElementById('btn-next'),
-        title: document.getElementById('q-text'),
-        counter: document.getElementById('q-counter'),
-        cancel: document.getElementById('cancel-text')
-    };
-
-    el.btnStart.onclick = () => {
-        views.profile.classList.add('hidden');
-        views.questions.classList.remove('hidden');
-        updateUI();
-    };
-
-    el.btnNext.onclick = (e) => {
-        count++;
-
-        if (count >= config.max) {
-            views.questions.classList.add('hidden');
-            views.love.classList.remove('hidden');
-        } else {
-            // Aumentar escala del botón (crecimiento)
-            btnScale += 0.25; // Crece un 25% en cada clic
-            el.btnNext.style.transform = `scale(${btnScale})`;
-            
-            // A medida que crece, se vuelve más redondo para ocupar espacio
-            if (btnScale > 5) el.btnNext.style.borderRadius = "50%";
-            
-            updateUI();
-        }
-    };
-
-    function updateUI() {
-        // Lógica de textos
-        if (count === 48) {
-            el.title.innerText = "¿SEGURO SEGURO?";
-        } else if (count === 49) {
-            el.title.innerText = "¿TOTALMENTE SEGURO?";
-            el.btnNext.style.background = "#ff4b4b"; // Cambio de color final
-            el.btnNext.style.color = "white";
-        } else {
-            el.title.innerText = "¿SEGURO?";
+        function render(id) {
+            const node = story[id];
+            textElement.innerText = node.text;
+            optionsElement.innerHTML = '';
+            node.options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.innerText = opt.text;
+                btn.className = 'btn';
+                btn.onclick = () => render(opt.next);
+                optionsElement.appendChild(btn);
+            });
         }
 
-        el.counter.innerText = `Validación nivel ${count + 1} de ${config.max}`;
-    }
-
-    el.cancel.onclick = () => location.reload();
-</script>
-
+        render(1);
+    </script>
 </body>
 </html>
